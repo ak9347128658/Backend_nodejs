@@ -212,46 +212,142 @@
 // }
 
 // example of switch statement with break and continue
-let day = 3; 
-let dayName = "tuesday";
+// let day = 3; 
+// let dayName = "tuesday";
 
-switch (day) {
-    case 1:
-        dayName = "Monday";
-        console.log("Today is Monday");
-        break;
-    case 2:
-        dayName = "Tuesday";
-        console.log("Today is Tuesday");
-        break;
-    case 3:
-        dayName = "wed";
-        if(false){
-            break;
-        }
-    case 3:
-        dayName = "Wednesday";
-        console.log("Today is Wednesday");
-        break;
-    case 4:
-        dayName = "Thursday";
-        console.log("Today is Thursday");
-        break;
-    case 5:
-        dayName = "Friday";
-        console.log("Today is Friday");
-        break;
-    case 6:
-        dayName = "Saturday";
-        console.log("Today is Saturday");
-        break;
-    case 7:
-        dayName = "Sunday";
-        console.log("Today is Sunday");
-        break;
-    default:
-        dayName = "Invalid day";
-}
+// switch (day) {
+//     case 1:
+//         dayName = "Monday";
+//         console.log("Today is Monday");
+//         break;
+//     case 2:
+//         dayName = "Tuesday";
+//         console.log("Today is Tuesday");
+//         break;
+//     case 3:
+//         dayName = "wed";
+//         if(false){
+//             break;
+//         }
+//     case 3:
+//         dayName = "Wednesday";
+//         console.log("Today is Wednesday");
+//         break;
+//     case 4:
+//         dayName = "Thursday";
+//         console.log("Today is Thursday");
+//         break;
+//     case 5:
+//         dayName = "Friday";
+//         console.log("Today is Friday");
+//         break;
+//     case 6:
+//         dayName = "Saturday";
+//         console.log("Today is Saturday");
+//         break;
+//     case 7:
+//         dayName = "Sunday";
+//         console.log("Today is Sunday");
+//         break;
+//     default:
+//         dayName = "Invalid day";
+// }
+
+// Nested If Statement: Nested if statements are used when you need to check Multiple conditions sequentially.
+
+// Basic Syntax:
+
+// if (condition1) {
+//     if(condition2){
+       
+//         if(condition3){
+//             // code to execute if condition1, condition2 and condition3 are true
+//         }
+
+//     }
+
+//     if(condition4){
+//         // code to execute if condition1 and condition4 are true
+//     }
+//         // code to execute if condition1 and condition4 are true
+// }
+
+// Example of Nested If Statement:
+// let age = 16;
+// let hasLicense = false;
+
+// if (age >= 18) {
+//    if (hasLicense) {
+//         console.log("You are eligible to drive.");
+//     }else{
+//         console.log("You are not eligible to drive.");
+//     }
+// }else{
+//     console.log("You are too young to drive.");
+// }
+
+// Example 2: Nested if-Else statements:
+// let score = 65;
+// let grade;
+
+// if (score >= 90) { // true
+//     grade = "A";
+// }else{
+//   if (score >= 80) {
+//         grade = "B";
+//     }else{
+//         if(score >= 70) {
+//             grade = "C";
+//         }else{
+//            if(score >= 60) {
+//                 grade = "D";
+//             }else{
+//                 grade = "F";
+//             }
+//         }
+//     }
+// }
+
+// console.log("Your grade is: " + grade); 
+
+// Example 3: User Authentication
+// let username = "sdfsadfs";
+// let password = '1234dfgkl';
+// let isAuthenticated = false;
+
+// if (username === "admin") { 
+//   if(password === "1234") {
+//         isAuthenticated = true;
+//         console.log("Authentication successful."+ " Welcome, " + username + "!");
+//     }else{
+//         console.log("Invalid password.");
+//     }
+// }else{
+//     console.log("Invalid username");
+// }
+
+// Nested Function: Nested functions are functions defined inside other functions.
+
+// syntax:
+// function outerFunction() {
+//     let outerVariable = "I am an outer variable";
+//     function innerFunction() {
+//         // code to be executed
+//         console.log(outerVariable); // accessing outer variable
+//     }
+//     innerFunction(); // calling the inner function
+// }
+
+// outerFunction();
+// outerFunction();
+
+
+
+
+
+
+
+
 
 
 
