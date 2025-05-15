@@ -174,3 +174,77 @@ function outerFunction() {
 
 outerFunction();
 ```
+
+## Practice Questions
+
+1. What is the main difference between `let` and `const` in JavaScript?  
+2. Declare a string variable called `city` and assign it the value `"Paris"`.  
+3. What will be the output of the following code?
+    ```js
+    let x;
+    console.log(typeof x);
+    ```
+4. Explain the difference between `null` and `undefined`.  
+5. Given `const pi = 3.14;`, what happens if you try to reassign `pi = 3.14159`?  
+6. Create an object `book` with properties `title`, `author`, and `pages`.  
+7. How do you access the `author` property of the `book` object you created?  
+8. Write an array of three numbers and log the second element.  
+9. What is the difference between primitive data types and reference types?  
+10. Given this code, what is the value of `z`?
+     ```js
+     var x = 5;
+     if (true) {
+        var x = 10;
+     }
+     let y = x + 5;
+     const z = y;
+     console.log(z);
+     ```
+11. Convert the following function to an arrow function:
+     ```js
+     function sum(a, b) {
+        return a + b;
+     }
+     ```
+12. Predict the output of:
+     ```js
+     console.log(typeof []);
+     console.log(typeof {});
+     ```
+13. Write an `if/else if/else` statement that checks a variable `score` and logs:
+     - "A" for 90 and above  
+     - "B" for 80–89  
+     - "C" for 70–79  
+     - "F" for below 70  
+14. Rewrite the following `if/else` as a `switch` statement:
+     ```js
+     let color = "green";
+     if (color === "red") {
+        console.log("Stop");
+     } else if (color === "yellow") {
+        console.log("Caution");
+     } else {
+        console.log("Go");
+     }
+     ```
+15. Explain block scope vs function scope with examples using `let` and `var`.  
+16. Write a nested `if` statement that checks if a number is positive and even.  
+17. What will the following code log, and why?
+     ```js
+     function test() {
+        console.log(a);
+        let a = 2;
+     }
+     test();
+     ```
+18. Create an `outerFunction` that defines a variable and an `innerFunction` that logs it. Call `outerFunction()`.  
+19. What is hoisting, and which declarations are hoisted in JavaScript?  
+20. Write a function `multiply` using arrow syntax that takes three parameters and returns their product.  
+21. Fill in the blank: “The `______` keyword declares a function-scoped variable.”  
+22. Given:
+     ```js
+     const fruits = ["apple", "banana"];
+     fruits.push("orange");
+     console.log(fruits);
+     ```
+     Is this valid? Explain why or why not.  
