@@ -3,6 +3,8 @@
 **let** allows reassigning values; **const** does not.  
 **var** is an older way of declaring variables and is not recommended.
 
+![variable and datatypes](../images/variableAndDatatypes.webp)
+
 ---
 
 ## 1. Primitive Data Types
@@ -52,6 +54,8 @@ console.log(fruits[3]); // grape
 
 ### Function  
 A reusable block of code.
+
+![functions](../images/function.webp)
 
 ```js
 function helloWorld() {
