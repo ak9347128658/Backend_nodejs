@@ -11,7 +11,6 @@ Loops let you execute a block of code repeatedly based on a condition (true/fals
 3. **do…while**  
 4. **for…in**  
 5. **for…of**  
-6. **Array.prototype.forEach**
 
 ---
 
