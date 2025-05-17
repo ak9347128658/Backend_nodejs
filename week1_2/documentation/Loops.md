@@ -35,6 +35,8 @@ for (let i = 0; i < 5; i++) {
     console.log(i);
 }
 ```
+![alt](../images/loops/01.webp)
+
 
 ### More For‐Loop Examples
 
@@ -44,6 +46,8 @@ for (let i = 0; i < 5; i++) {
         console.log(i);
     }
     ```
+![alt](../images/loops/02.webp)
+
 
 - **Sum 1 to 4 (1+2+3+4 = 10)**
     ```javascript
@@ -53,6 +57,7 @@ for (let i = 0; i < 5; i++) {
     }
     console.log(sum);
     ```
+![alt](../images/loops/03.webp)
 
 - **Even numbers 2 to 10**
     ```javascript
@@ -60,6 +65,7 @@ for (let i = 0; i < 5; i++) {
         console.log(i);
     }
     ```
+![alt](../images/loops/04.webp)
 
 - **Iterate over an array**
     ```javascript
@@ -68,6 +74,7 @@ for (let i = 0; i < 5; i++) {
         console.log(fruits[i]);
     }
     ```
+![alt](../images/loops/05.webp)
 
 - **Reverse order (5 to 1)**
     ```javascript
@@ -75,6 +82,8 @@ for (let i = 0; i < 5; i++) {
         console.log(i);
     }
     ```
+
+![alt](../images/loops/06.webp)
 
 ### Nested For‐Loop Star Patterns
 
@@ -89,6 +98,9 @@ for (let i = 0; i < 5; i++) {
     }
     ```
 
+![alt](../images/loops/07.webp)
+![alt](../images/loops/08.webp)
+
 - **Right Triangle**
     ```javascript
     for (let i = 1; i <= 5; i++) {
@@ -99,6 +111,7 @@ for (let i = 0; i < 5; i++) {
         console.log(row);
     }
     ```
+![alt](../images/loops/09.webp)
 
 - **Inverted Right Triangle**
     ```javascript
@@ -171,6 +184,9 @@ while (condition) {
     }
     console.log(rev);
     ```
+
+![alt](../images/loops/10.webp)
+![alt](../images/loops/11.webp)
 
 - **Right-angled triangle (5 rows)**
     ```javascript
