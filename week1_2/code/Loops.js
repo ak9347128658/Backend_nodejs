@@ -243,3 +243,234 @@
 //     * * * 
 //   * * * * * 
 // * * * * * * *
+
+// While Loop:
+// >> Definition: A do..while loop in javascript is similar to a while loop,but guarantess that the code block executes at least onece before checking the condition.The Condition is checked after each iteration,unlike a while loop,which checks before.
+
+// >> Syntax:
+// do {
+//   // Code to execute
+//   // Update condition (e.g., increment/decrement)
+// } while (condition);
+
+// >> Example:
+
+// 1.Print Numbers from 1 to 5
+// let i = 1;
+// do {
+//     console.log(i);
+//     i++;
+// } while(i <= 5);
+
+// 2.Count Characters in a String
+// let str = "Hello, World!";
+// let count = 0;
+// let i =0;
+// do {
+//   if(str[i]) count++;
+//   i++;
+// }while(i < str.length);  // str.length = 13
+// console.log("Number of characters in the string is: " + count);
+
+// practice question for do while loop:
+
+// 1. Generate Odd Numbers Up to 9
+// Output: 1, 3, 5, 7, 9
+
+// Nested do while loop:
+
+// 1.Print an inverted right-angled triangle of stars with 5 rows.
+// Output:
+// * * * * * 
+// * * * * 
+// * * * 
+// * * 
+// *
+// let i = 5;
+// do {
+//  let row = "";
+//  let j = 1;
+//   do{
+//    row = row + "* ";
+//     j++;
+//   }while(j<=i);
+//   console.log(row);
+//     i--;
+// }while(i>=1)
+
+// Practice Question for nested do while loop:\
+// 1.Print a 4x4 square of stars.
+// Output:
+// * * * * 
+// * * * * 
+// * * * * 
+// * * * *
+
+// 2.Hollow Square Star Pattern
+// Output:
+// * * * * * 
+// *       * 
+// *       * 
+// *       * 
+// * * * * *
+
+// For In Loop:
+// >> Definition: A for..in loop is used to iterate over the properties of an object or the elements of an array. It allows you to access each property or element by its key or index.
+
+// >> Syntax:
+// for (variable in object) {
+//     // Code to execute for each property or element
+// }
+
+// Example:
+// 1. Sum of Values in an Object
+// const scores = { math: 90, english: 85, science: 95, history: 80, geography: 88 ,telugu: 95,hindi: 90};
+// console.log(scores);
+// console.log(scores.math);
+// console.log(scores["math"]);
+// let sum = 0;
+// for (let subject in scores){
+//     sum = sum + scores[subject];
+// }
+// console.log("Sum of all subjects is: " + sum);
+
+// 2. Count properties in an Object
+// const car = {brand: "Toyota", model: "Camry", year: 2020, color: "blue", price: 30000};
+// let count = 0;
+// for(let propKey in car){
+//     count++;
+// }
+// console.log("Number of properties in the car object is: " + count);
+
+// 3. Filter Properties by Value Type
+// Task: Print only the properties of an object that have string values.
+// const person = {name: "John", age: 30, city: "New York", isStudent: false};
+// for(let key in person){
+//    if(typeof person[key] === "string"){
+//        console.log(key + ": " + person[key]);
+//    }
+// }
+
+// Practice Question for For In Loop:
+// 1. Build a Repeated Pattern Using Object Values:
+// Task: Use Object Values to repeate a character (e.g., "*") for a visual representation.
+// const sizes = { small: 3, medium: 5, large: 7 };
+// Output:
+// small: ***
+// medium: *****
+// large: *******
+
+// For Of Loop:
+// >> Definition: A for..of loop is used to iterate over iterable objects like arrays, strings, and other collections. It allows you to access each element directly without needing an index.
+// >> Syntax:
+// for (variable of iterable) {
+//     // Code to execute for each element
+// }
+
+// Example:
+// 1. Sum of Array Elements
+// const expenses = [100, 200, 300, 400, 500];  // array is a iterable object type
+// let sum = 0;
+// for(let amount of expenses){
+//   sum = sum + amount;
+// }
+// console.log("Sum of expenses is: " + sum);
+
+// 2. Find Longest String in an Array
+// const words = ["cat", "elephant", "dog", "giraffe"];
+// let longestWord = "";
+// for(let word of words){
+//    if(word.length > longestWord.length){  // 7 > 7
+//        longestWord = word;
+//    }
+// }
+
+// console.log("Longest word is: " + longestWord);
+
+// Array method to push elements into an array
+// const numbers = [ ];
+// console.log(numbers);
+// numbers.push(1);
+// numbers.push(4);
+// numbers.push(3);
+// numbers.push(2);
+// console.log(numbers);
+
+// 3. Filter Positive Numbers from an Array
+// Task: Create a new Array containing only positive numbers from a given array.
+// const numbers = [-5, 10, -3, 7, -1, 4];
+// const positiveNumbers = [];
+// for(let number of numbers){
+//    if(number > 0){
+//          positiveNumbers.push(number);
+//    }
+// }
+
+// console.log("Positive numbers are: " + positiveNumbers);
+
+// Break and Continue Statements:
+// Definition
+
+// Break:
+// Exits the loop entirely, stopping further iterations, regardless of the loop’s condition.
+// Used when a specific condition is met, and you want to terminate the loop immediately.
+// Works in all loop types (for, while, do...while, for...in, for...of).
+// Example: Stop searching an array once a target value is found.
+
+// Continue:
+// Skips the current iteration and proceeds to the next iteration of the loop, without exiting the loop.
+// Used to bypass certain iterations based on a condition while continuing the loop.
+// Works in all loop types.
+// Example: Skip printing odd numbers in a loop that iterates from 1 to 10.
+
+// >> syntax for break:
+// for (let i = 0; i < n; i++) {
+//   if (condition) {
+//     break; // Exits the loop
+//   }
+// }
+
+// >> syntax for continue:
+// for (let i = 0; i < n; i++) {
+//   if (condition) {
+//     continue; // Skips to the next iteration
+//   }
+//   // Code here is skipped if continue is triggered
+// }
+
+// Example of break statement:
+// 1. Find First Negative Number in an Array
+// Task: Find and print the first negative nubmer in an Array,then stop;
+// const numbers = [5,8,-3,10,-7,2];
+// for(let number of numbers){
+//   if(number < 0){
+//     console.log("First negative number is: " + number);
+//     break;
+//   }
+// }
+
+// 2.Skip Vowels in a string (for..of)
+// const str = "hello";
+// for(let char of str){
+//   if(char === "a" || char === "e" || char === "i" || char === "o" || char === "u"){
+//     continue; // Skip vowels
+//   }
+//   console.log(char); // Print consonants
+// }
+
+// Practice Question for Break and Continue:
+// 1. Skip Zero Values in an Array
+// Task: Print non-zero values from an array, skipping any zeros.
+// const measurements = [10, 0, 25, 0, 30, 15];
+// write the code
+// Output:
+// 10
+// 25
+// 30
+// 15
+
+// 2. Limit Sum of Numbers(do..while)
+// Task: Sum numbers from 1 until the sum exceeds 20,then stop.
+// code
+// Output:
+// Sum exceeded 20: 21
