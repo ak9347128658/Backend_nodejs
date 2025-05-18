@@ -122,9 +122,6 @@ anotherMachine.makeCoffee(); // Output: Not enough water to make coffee.
 
 
 ### Practice Questions for above tops
-
----
-
 ### Practice Question 1: Polymorphism - Triangle Area
 **Problem**: Create a `Triangle` class that extends the `Shape` class (from Polymorphism Example 1). The `Triangle` class should have `base` and `height` properties and override the `getArea` method to return `(base * height) / 2`. Instantiate a `Triangle`, a `Circle`, and a `Rectangle`, and log their areas.
 
@@ -202,4 +199,3 @@ anotherMachine.makeCoffee(); // Output: Not enough water to make coffee.
 - For abstraction, use private fields (e.g., `#field`) to hide internal details and expose only necessary methods.
 - For static methods, call them directly on the class (e.g., `ClassName.method()`) and ensure they don’t rely on instance data.
 - Verify that your code produces the expected output and handles edge cases (e.g., insufficient stock, invalid inputs).
-
