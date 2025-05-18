@@ -88,18 +88,21 @@
 // console.log(`Account Two New Account Number: ${accountTwo.accountNumber}`); // Output: Account Two New Account Number: 000000000
 
 // Example 3: Encapsulation with Closures
-// function createLibrary(){
-//     // private variable 
-//     let books = []; // Private variable
+// function createLibrary() {
+//     let books = [];
+
 //     return {
-//         addBook: function(title, author){
-//             books.push({title, author});
+//         addBook: function(title,author){
+//             books.push({title,author});
 //         },
 //         getBooks: function(){
 //             return books;
 //         },
-//         findBook: function(title){ 
-//             return books.find(book => book.title === title);
+//         findBookByTitle: function(title){
+//             const book = books.find((book) => {
+//                 return book.title === title;
+//             })
+//             return book ? book : "Book not found";
 //         }
 //     }
 // }
@@ -109,27 +112,34 @@
 // library.addBook("To Kill a Mockingbird", "Harper Lee");
 // library.addBook("1984", "George Orwell");
 // library.addBook("The Catcher in the Rye", "J.D. Salinger");
-// library.addBook("The Great Gatsby", "F. Scott Fitzgerald");
 
-// // console.log(library.getBooks()); // Output: Array of book objects
+// // console.log(library.getBooks()); // Output: Array of books
 
-// console.log(library.findBook("The Great Gatsby"));
-
+// console.log(library.findBookByTitle('1984')); // Output: { title: 'The Great Gatsby', author: 'F. Scott Fitzgerald' }
 
 // Example 4: Encapsulation with Class Private Fields
 // class Library {
-//    #books = []; // Private field
-   
-//    addBook(title, author) {
-//       this.#books.push({ title, author });
-//    }
+//     #books = [];
+//     constructor(books) {
+//         this.#books = books;
+//     }
+//     // constructor(){
+
+//     // }
+
+//     addBook(title, author) {
+//         this.#books.push({ title, author });
+//     }
 
 //     getBooks() {
 //         return this.#books;
 //     }
 
-//     findBook(title) {
-//         return this.#books.find(book => book.title === title);
+//     findBookByTitle(title) {
+//         const book = this.#books.find((book) => {
+//             return book.title === title;
+//         })
+//         return book ? book : "Book not found";
 //     }
 // }
 
@@ -138,8 +148,17 @@
 // library.addBook("To Kill a Mockingbird", "Harper Lee");
 // library.addBook("1984", "George Orwell");
 // library.addBook("The Catcher in the Rye", "J.D. Salinger");
-// library.addBook("The Great Gatsby", "F. Scott Fitzgerald");
 
-// console.log(library.getBooks()); // Output: Array of book objects
-// console.log(library.findBook("The Great Gatsby")); // Output: { title: "The Great Gatsby", author: "F. Scott Fitzgerald" }
+// const books= [
+//     { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
+//     { title: "To Kill a Mockingbird", author: "Harper Lee" },
+//     { title: "1984", author: "George Orwell" },
+//     { title: "The Catcher in the Rye", author: "J.D. Salinger" }
+// ];
 
+// const library = new Library(books);
+// library.addBook("The Alchemist", "Paulo Coelho");
+
+// console.log(library.getBooks()); // Output: Array of books
+
+// console.log(library.findBookByTitle('1984')); // Output: { title: 'The Great Gatsby', author: 'F. Scott Fitzgerald' }
