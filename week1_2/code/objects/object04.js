@@ -1,5 +1,5 @@
 // Object Spread and Rest Operators
-// The spread (...) operator copies or merges object properties, while the rest operator collects remaining properties
+// The spread (...) operator copies or merges object properties, while the (...rest) rest operator collects remaining properties
 
 // Examples
 
@@ -8,7 +8,6 @@
 //     name: "Uma",
 //     age: 30,
 //     hobbies: ["reading", "traveling"]
-
 // }
 
 
@@ -44,7 +43,7 @@
 //     age: 27,
 //     role:"User"
 // }
-// // const {name :myname,age} = user;
+// const {name:myname,age} = user;
 // const {name,age} = user;
 
 // console.log(name);
@@ -52,11 +51,13 @@
 // 5.Combining Spread and Rest
 // const base = {
 //     id: 1,
-//     name: "Will"
+//     name: "Will",
+//     age: 35,
+//     hobbies: ["coding", "gaming"],
+//     city: "San Francisco",
+//     phoneNumber: "123-456-7890"
 // }
-// const {id,...rest} = base;
+// const {id,phoneNumber,...rest} = base;
 
-
-// const updated = {...rest,name: "Charlie"};
-
-// console.log(updated); 
+// console.log(id);
+// console.log(rest);

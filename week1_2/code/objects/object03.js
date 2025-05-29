@@ -81,9 +81,11 @@
 // const target = { a : 1};
 // const source = { b: 2}
 
+// console.log("Before :", target);
+
 // Object.assign(target, source);
 
-// console.log(target);
+// console.log("After :",target);
 
 // 2. Using Object.freeze():
 // const user = {
@@ -122,6 +124,8 @@
 
 // Object.freeze(person);
 
+// Object.freeze(person.address); // Freezing the nested object
+
 // person.name = "Charlie";
 // person.address.city = "Paris"; // ✅ This works because `address` is not frozen
 
@@ -151,6 +155,7 @@
 
 // console.log("Before ", user2);
 
+// user2.name = "Bob";
 // user2.address.city = "London"; // This will work because `address` is not frozen
 
 // console.log("After :",user2);

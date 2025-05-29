@@ -10,16 +10,16 @@
 //     name: "Yara",
 //     age: 29
 // }
-// console.log("Before JSON.stringify():", user.name);
+// console.log("Before JSON.stringify():", user);
 
 // console.log("Type of user :", typeof user);
 
-// const json = JSON.stringify(user);
+// const jsonString = JSON.stringify(user);
 
-// console.log("JSON String:", json);
-// console.log("Type of JSON String:", typeof json);
+// console.log("JSON String:", jsonString);
+// console.log("Type of JSON String:", typeof jsonString);
 
-// 2.Parse JSON to Object:
+// 2.Parse JSON string to an Object:
 // const jsonString = '{"name":"Zara","age":32}';
 
 // console.log("JSON String:", jsonString);
@@ -29,6 +29,6 @@
 // console.log("Parsed Object:", parsedObject);
 
 // 3. Stringify with Formatting:
-const data = {name:"Zoe",scores:[85, 90, 95]};
-const formatted = JSON.stringify(data,null,2); // Pretty print with 2 spaces indentation
-console.log("Formatted JSON String:", formatted);
+// const data = {name:"Zoe",scores:[85, 90, 95]};
+// const formatted = JSON.stringify(data,null,2); // Pretty print with 2 spaces indentation
+// console.log("Formatted JSON String:", formatted);
