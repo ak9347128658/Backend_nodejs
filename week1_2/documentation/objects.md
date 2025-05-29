@@ -1,455 +1,763 @@
-Defination: In JavaScript, an object is a collection of key-value pairs, where keys are strings (or symbols) and values can be any data type, including numbers, strings, arrays, functions, or even other objects. Objects are used to store and organize data in a structured way, allowing you to represent real-world entities with properties and behaviors.
+## **Definition of a JavaScript Object**
 
-key 1. Objects are created using curly braces {} or the new Object() constructor. Each Key-value pair is called a property, and if the value is a function, it’s called a method. Objects are mutable, meaning their properties can be added, modified, or deleted after creation.
+A JavaScript **object** is a collection of key-value pairs, where keys are strings (or symbols) and values can be any data type, including other objects, arrays, functions, or primitives. Objects are used to represent real-world entities or store structured data. They are mutable, dynamic, and central to JavaScript programming.
 
-Example 1: Creating a Simple Object  
-Creating an object using object literal syntax:
-```js
-const person = {
-  name: "John",
-  age: 30,
-  greet: function() {
-    console.log(`Hello, my name is ${this.name}`);
-  },
-  getName: function() {
-    return this.name;  // in objects functions can be called as methods
-  }
-};
-console.log(person);
-// Accessing properties:
-console.log(person.name); // Output: John
-console.log(person["age"]); // Output: 30
-// Calling a method:
-person.greet();
-
-const personName = person.getName();
-console.log(personName); // Output: John
-```
-
-Example 2: Creating an Object with Constructor Function
-```js
-const car = new Object();
-console.log(car);
-car.brand = "Toyota";
-car["model"] = "Camry";
-car.year = 2020;
-car.start = function() {
-   console.log(`Starting the ${this.brand} ${this.model}`);
-};
-
-console.log(car);
-// Accessing properties:
-console.log(car.brand);  // Output: Toyota
-console.log(car.model);  // Output: Camry
-console.log(car.start()); // Output: 2020
-```
-
-key 2. Objects can be nested, meaning a property’s value can be another object. This allows for complex data structures to represent hierarchical relationships.
-
-Example 1: Nested Objects
-```js
-const company = {
-   name: "Tech Corp",
-   location: "New York",
-   employees: [
-      {
-        name: "Alice",
-        position: "Developer",
-        skills: ["JavaScript", "React"],
-        address: {
-           street: "123 Main St",
-           city: "New York",
-           zip: "10001"
-        }
-      },
-      {
-        name: "Bob",
-        position: "Designer",
-        skills: ["Photoshop", "Illustrator"]
-      }
-   ],
-};
-
-// Accessing nested properties:
-console.log(company.employees[0].name); // Output: Alice
-console.log(company.employees[0].address.city);
-```
-
-Example 2: Nested Objects with Methods
-```js
-const school = {
-   name: "Green Valley High",
-   location: "California",
-   established: 1995,
-   students: [
-      {
-        name: "Emma",
-        age: 16,
-        subjects: ["Math", "Science"],
-        getDetails: function() {
-           return `${this.name}, Age: ${this.age}`;
-        }
-      },
-      {
-        name: "Liam",
-        age: 17,
-        subjects: ["History", "Art"],
-        getDetails: function() {
-           return `${this.name}, Age: ${this.age}`;
-        }
-      }
-   ],
-};
-
-// Accessing nested properties and methods:
-console.log(school.students[1].getDetails());
-```
-
-key 3. Properties can be added or deleted dynamically using assignment or the delete operator. This makes JavaScript objects highly flexible for runtime modifications.
-
-Example 1: Adding properties dynamically
-```js
-const laptop = {
-   brand: "Dell"
-};
-
-console.log(laptop); // Output: { brand: 'Dell' }
-laptop.model = "XPS 13";
-laptop.year = 2022;
-console.log(laptop); // Output: { brand: 'Dell', model: 'XPS 13', year: 2022 }
-```
-
-Example 2: Deleting properties
-```js
-const phone = {
-   brand: "Samsung",
-   model: "Galaxy S21",
-   year: 2021,
-   color: "Black"
-};
-console.log(phone); // Output: { brand: 'Samsung', model: 'Galaxy S21', year: 2021, color: 'Black' }
-
-delete phone.color;
-console.log(phone); // Output: { brand: 'Samsung', model: 'Galaxy S21', year: 2021 }
-```
-
-Key 4. Objects can be copied using methods like Object.assign() or the spread operator (...). However, this creates a shallow copy, meaning nested objects are still referenced rather than copied.
-
-Example 1: Shallow Copy using Object.assign() or Spread
-```js
-const original = {
-   name: "Eve",
-   details: {
-      age: 25
-   }
-};
-console.log(original); // Output: { name: 'Eve', details: { age: 25 } }
-// const copy = Object.assign({}, original); // Using Object.assign() to create a shallow copy
-const copy = { ...original }; // Using spread operator
-copy.name = "Charlie";
-
-console.log(original); // Output: { name: 'Eve', details: { age: 25 } }
-console.log(copy);     // Output: { name: 'Charlie', details: { age: 25 } }
-```
-
-Key 5. Object methods like Object.keys(), Object.values(), and Object.entries() allow iteration over properties. These are useful for inspecting or manipulating object data.  
-object.keys() returns an array of keys of an object  
-object.values() returns an array of values of an object  
-object.entries() returns an array of key-value pairs of an object
-
-Example 1: Using Object.keys(), Object.values()
-```js
-const fruit = {
-   name: "Apple",
-   color: "Red",
-   weight: 150,
-   taste: "Sweet"
-};
-
-const fruitKeys = Object.keys(fruit);
-const fruitValues = Object.values(fruit);
-
-console.log(fruitKeys);   // Output: ['name', 'color', 'weight', 'taste']
-console.log(fruitValues); // Output: ['Apple', 'Red', 150, 'Sweet']
-```
-
-Example 2: Using Object.entries()
-```js
-const product = {
-   id: "P123",
-   name: "Mouse",
-   price: 25
-};
-
-const productEntries = Object.entries(product);
-console.log(productEntries); // Output: [['id', 'P123'], ['name', 'Mouse'], ['price', 25]]
-
-console.log(productEntries[0][1]);
-
-for(const item of productEntries) {
-  console.log(item[0], item[1]);
-}
-```
-
-key 6. Objects can use computed property names, allowing dynamic key creation.
-
-Example 1: Computed Property Names
-```js
-const perfix = "user_";
-const user = {
-   [perfix + "name"]: "John",
-   [perfix + "age"]: 30,
-   [perfix + "email"]: "john@gmail.com"
-};
-
-console.log(user); // Output: { user_name: 'John', user_age: 30, user_email: 'john@gmail.com' }
-```
-
-key 7. Objects can be frozen or sealed to restrict modifications. Object.freeze() prevents all changes, while Object.seal() allows modifying existing properties but not adding or deleting.
-
-Example 1: Freezing an Object
-```js
-const config = {
-   host: "localhost",
-   port: 8080,
-   protocol: "http",
-};
-console.log(config); // Output: { host: 'localhost', port: 8080, protocol: 'http' }
-Object.freeze(config); // Freezing the object
-config.protocol = "https"; // Attempting to modify a frozen object
-config.timeout = 5000; // Attempting to add a new property
-config.port = 3000; // Attempting to modify an existing property
-console.log(config); // Output: { host: 'localhost', port: 8080, protocol: 'http' }
-```
-
-Example 2: Sealing an Object
-```js
-const settings = {
-   theme: "dark",
-   notifications: true
-};
-console.log(settings); // Output: { theme: 'dark', notifications: true }
-Object.seal(settings); // Sealing the object
-settings.theme = "light"; // Modifying an existing property
-delete settings.notifications; // Attempting to delete a property
-settings.language = "en"; // Attempting to add a new property
-console.log(settings); // Output: { theme: 'light', notifications: true }
-```
-
-Key 8. Objects can be used with prototypes to share properties and methods. Every object in JavaScript has a prototype, which is another object from which it inherits properties and methods.
-
-Example 1: Using Prototypes with Object.create()
-```js
-const animal = {
-   eat: function() {
-      console.log(`${this.name} is eating.`);
-   }
-};
-
-// console.log(animal); // Output: { eat: [Function: eat] }
-
-const dog = Object.create(animal); // Creating a new object with animal as prototype
-dog.name = "Buddy";
-dog.eat();
-
-const cat = Object.create(animal);
-cat.name = "Whiskers";
-cat.eat(); // Output: Whiskers is eating.
-```
-
-Example 2: Using Object.create() with 3 Generations
-
-Generation 1: Grandparent
-```js
-const grandparent = {
-   lastName: "Smith",
-   greet: function() {
-      console.log(`Hello, I'm a ${this.lastName}`);
-   }
-};
-```
-Generation 2: Parent inherits from Grandparent
-```js
-const parent = Object.create(grandparent);
-parent.firstName = "John";
-parent.introduce = function() {
-   console.log(`Hi, I'm ${this.firstName} ${this.lastName}`);
-};
-```
-Generation 3: Child inherits from Parent
-```js
-const child = Object.create(parent);
-child.age = 10;
-child.name = "Alice";
-child.describe = function() {
-   console.log(`I'm ${this.name} ${this.lastName}, and I'm ${this.age} years old.`);
-};
-
-child.describe();  // Output: I'm Alice Smith, and I'm 10 years old.
-child.introduce(); // Output: Hi, I'm John Smith
-child.greet();     // Output: Hello, I'm a Smith
-```
-
-Proactice Questions on JavaScript Objects
----
-
-### Practice Questions on JavaScript Objects
-
-#### Beginner Level: Understanding Object Basics
-1. **Create a Simple Object**  
-  - Create an object representing a book with properties for `title`, `author`, and `year`. Log the book’s title and author to the console.  
-  - *Expected Output*:
-    ```
-    Title: [Your Book Title]
-    Author: [Your Author Name]
-    ```
-
-2. **Access Properties**  
-  - Create an object for a car with properties `brand`, `model`, and `color`. Access the `model` using both dot notation and bracket notation, and log the results.  
-  - *Expected Output*:
-    ```
-    Model (dot): [Your Model]
-    Model (bracket): [Your Model]
-    ```
-
-3. **Add a Method**  
-  - Create an object for a person with `name` and `age` properties. Add a method `sayHello` that logs a greeting using the person’s name. Call the method.  
-  - *Expected Output*:
-    ```
-    Hello, my name is [Your Name]!
-    ```
-
-4. **Modify Properties**  
-  - Create an object for a laptop with `brand` and `price`. Change the `price` to a new value and add a `ram` property. Log the updated object.  
-  - *Expected Output*:
-    ```
-    { brand: '[Your Brand]', price: [New Price], ram: '[Your RAM]' }
-    ```
-
-#### Intermediate Level: Working with Methods and Nested Objects
-5. **Calculate Area**  
-  - Create an object for a rectangle with `width` and `height` properties. Add a method `getArea` that returns the area (width * height). Log the area.  
-  - *Expected Output*:
-    ```
-    Area: [Width * Height]
-    ```
-
-6. **Nested Object Access**  
-  - Create an object for a student with a nested `address` object containing `street`, `city`, and `zip`. Log the city and zip using dot and bracket notation.  
-  - *Expected Output*:
-    ```
-    City: [Your City]
-    Zip: [Your Zip]
-    ```
-
-7. **Dynamic Property Addition**  
-  - Create an empty object. Prompt the user for a property name and value (or hardcode them), then add them to the object. Log the object.  
-  - *Expected Output*:
-    ```
-    { [UserInputKey]: '[UserInputValue]' }
-    ```
-
-8. **Delete a Property**  
-  - Create an object for a phone with `brand`, `model`, and `color`. Delete the `color` property and log the updated object.  
-  - *Expected Output*:
-    ```
-    { brand: '[Your Brand]', model: '[Your Model]' }
-    ```
-
-9. **Object with Array**  
-  - Create an object for a classroom with a `name` and a `students` array of names. Add a method `addStudent` that pushes a new name to the array. Call it and log the array.  
-  - *Expected Output*:
-    ```
-    Students: ['Name1', 'Name2', 'NewName']
-    ```
-
-10. **Iterate with `Object.keys()`**  
-   - Create an object for a product with `id`, `name`, and `price`. Use `Object.keys()` to log all property names.  
-   - *Expected Output*:
-    ```
-    id
-    name
-    price
-    ```
-
-#### Advanced Level: Copying, Prototypes, and Dynamic Behavior
-11. **Shallow Copy**  
-   - Create an object with a nested object (e.g., `person` with `details`). Create a shallow copy using the spread operator. Modify the nested object in the copy and log both objects to show the shared reference.  
-   - *Expected Output*:
-    ```
-    Original: { name: '...', details: { modifiedProperty: '...' } }
-    Copy: { name: '...', details: { modifiedProperty: '...' } }
-    ```
-
-12. **Deep Copy (Challenge)**  
-   - Create an object with a nested object. Write a function to create a deep copy (no shared references). Modify the nested object in the copy and log both objects to confirm independence.  
-   - *Expected Output*:
-    ```
-    Original: { name: '...', nested: { ... } }
-    Copy: { name: '...', nested: { modifiedProperty: '...' } }
-    ```
-
-13. **Computed Property Names**  
-   - Create an object where property names are generated dynamically (e.g., `prop1`, `prop2`) using a loop or array. Add values to these properties and log the object.  
-   - *Expected Output*:
-    ```
-    { prop1: 'Value1', prop2: 'Value2' }
-    ```
-
-14. **Object Iteration with `Object.entries()`**  
-   - Create an object for a shopping cart with item names and quantities. Use `Object.entries()` to log each item and its quantity in a formatted string.  
-   - *Expected Output*:
-    ```
-    Item: Apple, Quantity: 5
-    Item: Banana, Quantity: 3
-    ```
-
-15. **Freeze an Object**  
-   - Create an object for a configuration with `host` and `port`. Freeze it using `Object.freeze()`. Attempt to modify a property and add a new one, then log the object.  
-   - *Expected Output*:
-    ```
-    { host: '[Your Host]', port: [Your Port] }
-    ```
-
-16. **Seal an Object**  
-   - Create an object for settings with `theme` and `volume`. Seal it using `Object.seal()`. Modify an existing property, try to add a new one, and log the object.  
-   - *Expected Output*:
-    ```
-    { theme: '[Modified Theme]', volume: [Your Volume] }
-    ```
-
-#### Expert Level: Prototypes and Inheritance
-17. **Prototype with `Object.create()`**  
-   - Create a `vehicle` object with a `move` method. Use `Object.create()` to create a `car` object that inherits from `vehicle`. Add a `honk` method to `car`. Call both methods.  
-   - *Expected Output*:
-    ```
-    [Car Name] is moving!
-    [Car Name] says Beep!
-    ```
-
-18. **Constructor Function**  
-   - Write a `Book` constructor function with `title` and `author`. Add a `getDetails` method to its prototype that returns a string with the book’s details. Create two book instances and call the method.  
-   - *Expected Output*:
-    ```
-    Title: [Book1 Title], Author: [Book1 Author]
-    Title: [Book2 Title], Author: [Book2 Author]
-    ```
-
-19. **Prototype Chain**  
-   - Create a `person` object with a `greet` method. Use `Object.create()` to create a `student` object that inherits from `person`. Add a `study` method to `student`. Call both methods and use `console.log(student.__proto__)` to inspect the prototype.  
-   - *Expected Output*:
-    ```
-    Hello from [Student Name]!
-    [Student Name] is studying.
-    { greet: [Function] }
-    ```
-
-20. **Simulate a Class with Prototypes**  
-   - Create a `Rectangle` constructor with `width` and `height`. Add `getArea` and `getPerimeter` methods to its prototype. Create two rectangles and log their areas and perimeters.  
-   - *Expected Output*:
-    ```
-    Rectangle 1 - Area: [W1*H1], Perimeter: [2*(W1+H1)]
-    Rectangle 2 - Area: [W2*H2], Perimeter: [2*(W2+H2)]
-    ```
+- **Key Characteristics**:
+  - Objects are unordered collections.
+  - Keys are unique; values can be of any type.
+  - Objects can have properties (data) and methods (functions).
+  - Objects support prototype-based inheritance.
 
 ---
+
+## **Topics Covered**
+
+1. **Object Creation**
+2. **Accessing and Modifying Properties**
+3. **Object Methods**
+4. **Object Prototypes and Inheritance**
+5. **Object Property Descriptors**
+6. **Iterating Over Objects**
+7. **Object Methods (Built-in)**
+8. **Destructuring Objects**
+9. **Object Spread and Rest Operators**
+10. **JSON and Objects**
+
+For each topic, I’ll provide a definition, explanation, and at least five examples.
+
+---
+
+### **1. Object Creation**
+
+**Definition**: Objects can be created using various methods, including object literals, constructor functions, `Object.create()`, classes, or factory functions.
+
+**Explanation**: JavaScript offers multiple ways to create objects, each suited for different use cases. Object literals are the simplest, while classes provide a more structured approach for complex applications.
+
+**Examples**:
+
+1. **Object Literal**:
+   ```javascript
+   const person = {
+       name: "Alice",
+       age: 25
+   };
+   console.log(person); // { name: "Alice", age: 25 }
+   ```
+
+2. **Using `new Object()`**:
+   ```javascript
+   const car = new Object();
+   car.make = "Toyota";
+   car.model = "Camry";
+   console.log(car); // { make: "Toyota", model: "Camry" }
+   ```
+
+3. **Constructor Function**:
+   ```javascript
+   function Student(name, grade) {
+       this.name = name;
+       this.grade = grade;
+   }
+   const student = new Student("Bob", 10);
+   console.log(student); // Student { name: "Bob", grade: 10 }
+   ```
+
+4. **Using `Object.create()`**:
+   ```javascript
+   const animalProto = { speak: () => console.log("Animal speaks!") };
+   const dog = Object.create(animalProto);
+   dog.breed = "Labrador";
+   console.log(dog.breed); // "Labrador"
+   dog.speak(); // "Animal speaks!"
+   ```
+
+5. **Using ES6 Class**:
+   ```javascript
+   class Book {
+       constructor(title, author) {
+           this.title = title;
+           this.author = author;
+       }
+   }
+   const book = new Book("1984", "Orwell");
+   console.log(book); // Book { title: "1984", author: "Orwell" }
+   ```
+
+---
+
+### **2. Accessing and Modifying Properties**
+
+**Definition**: Object properties can be accessed or modified using dot notation (`.`) or bracket notation (`[]`).
+
+**Explanation**: Dot notation is concise for known keys, while bracket notation is flexible for dynamic keys or keys with special characters. Properties can be added, updated, or deleted dynamically.
+
+**Examples**:
+
+1. **Dot Notation Access**:
+   ```javascript
+   const user = { name: "Charlie", age: 30 };
+   console.log(user.name); // "Charlie"
+   ```
+
+2. **Bracket Notation Access**:
+   ```javascript
+   const product = { "item-name": "Laptop" };
+   console.log(product["item-name"]); // "Laptop"
+   ```
+
+3. **Adding a Property**:
+   ```javascript
+   const phone = { brand: "Apple" };
+   phone.model = "iPhone 14";
+   console.log(phone); // { brand: "Apple", model: "iPhone 14" }
+   ```
+
+4. **Modifying a Property**:
+   ```javascript
+   const laptop = { brand: "Dell", price: 1000 };
+   laptop.price = 1200;
+   console.log(laptop.price); // 1200
+   ```
+
+5. **Deleting a Property**:
+   ```javascript
+   const employee = { id: 101, name: "Eve" };
+   delete employee.id;
+   console.log(employee); // { name: "Eve" }
+   ```
+
+---
+
+### **3. Object Methods**
+
+**Definition**: Methods are functions stored as object properties, allowing objects to perform actions.
+
+**Explanation**: Methods are defined as functions within an object. They can use `this` to access other properties of the same object, enabling dynamic behavior.
+
+**Examples**:
+
+1. **Basic Method**:
+   ```javascript
+   const calculator = {
+       add: (a, b) => a + b
+   };
+   console.log(calculator.add(5, 3)); // 8
+   ```
+
+2. **Using `this` in a Method**:
+   ```javascript
+   const person = {
+       name: "Frank",
+       greet() {
+           return `Hello, ${this.name}!`;
+       }
+   };
+   console.log(person.greet()); // "Hello, Frank!"
+   ```
+
+3. **Method with Parameters**:
+   ```javascript
+   const rectangle = {
+       width: 10,
+       height: 5,
+       area() {
+           return this.width * this.height;
+       }
+   };
+   console.log(rectangle.area()); // 50
+   ```
+
+4. **Dynamic Method Assignment**:
+   ```javascript
+   const game = {};
+   game.start = function() {
+       return "Game started!";
+   };
+   console.log(game.start()); // "Game started!"
+   ```
+
+5. **Arrow Function as Method**:
+   ```javascript
+   const counter = {
+       count: 0,
+       increment: () => counter.count++ // Note: Arrow functions don't bind `this`
+   };
+   counter.increment();
+   console.log(counter.count); // 1
+   ```
+
+---
+
+### **4. Object Prototypes and Inheritance**
+
+**Definition**: JavaScript uses prototype-based inheritance, where objects can inherit properties and methods from other objects via their prototype.
+
+**Explanation**: Every object has a prototype, accessible via `__proto__` or `Object.getPrototypeOf()`. Prototypes allow shared behavior across objects, enabling inheritance.
+
+**Examples**:
+
+1. **Adding to Prototype**:
+   ```javascript
+   function Animal(name) {
+       this.name = name;
+   }
+   Animal.prototype.speak = function() {
+       return `${this.name} makes a sound.`;
+   };
+   const cat = new Animal("Whiskers");
+   console.log(cat.speak()); // "Whiskers makes a sound."
+   ```
+
+2. **Using `Object.create()` for Inheritance**:
+   ```javascript
+   const vehicle = { drive: () => "Driving..." };
+   const car = Object.create(vehicle);
+   car.model = "Sedan";
+   console.log(car.drive()); // "Driving..."
+   ```
+
+3. **Class-Based Inheritance**:
+   ```javascript
+   class Animal {
+       constructor(name) {
+           this.name = name;
+       }
+       speak() {
+           return `${this.name} speaks.`;
+       }
+   }
+   class Dog extends Animal {
+       bark() {
+           return "Woof!";
+       }
+   }
+   const dog = new Dog("Rex");
+   console.log(dog.speak()); // "Rex speaks."
+   console.log(dog.bark()); // "Woof!"
+   ```
+
+4. **Setting Prototype Manually**:
+   ```javascript
+   const proto = { greet: () => "Hello!" };
+   const obj = {};
+   Object.setPrototypeOf(obj, proto);
+   console.log(obj.greet()); // "Hello!"
+   ```
+
+5. **Checking Prototype**:
+   ```javascript
+   const person = { name: "Grace" };
+   console.log(Object.getPrototypeOf(person) === Object.prototype); // true
+   ```
+
+---
+
+### **5. Object Property Descriptors**
+
+**Definition**: Property descriptors define attributes of object properties, such as `writable`, `enumerable`, and `configurable`.
+
+**Explanation**: Use `Object.defineProperty()` or `Object.defineProperties()` to control property behavior, such as making properties read-only or non-enumerable.
+
+**Examples**:
+
+1. **Read-Only Property**:
+   ```javascript
+   const obj = {};
+   Object.defineProperty(obj, "id", {
+       value: 123,
+       writable: false
+   });
+   obj.id = 456; // Fails silently
+   console.log(obj.id); // 123
+   ```
+
+2. **Non-Enumerable Property**:
+   ```javascript
+   const user = { name: "Helen" };
+   Object.defineProperty(user, "secret", {
+       value: "hidden",
+       enumerable: false
+   });
+   console.log(Object.keys(user)); // ["name"]
+   ```
+
+3. **Getter and Setter**:
+   ```javascript
+   const person = {
+       _age: 30,
+       get age() {
+           return this._age;
+       },
+       set age(value) {
+           this._age = value > 0 ? value : 0;
+       }
+   };
+   person.age = 25;
+   console.log(person.age); // 25
+   ```
+
+4. **Non-Configurable Property**:
+   ```javascript
+   const obj = {};
+   Object.defineProperty(obj, "constant", {
+       value: "fixed",
+       configurable: false
+   });
+   delete obj.constant; // Fails
+   console.log(obj.constant); // "fixed"
+   ```
+
+5. **Multiple Descriptors**:
+   ```javascript
+   const data = {};
+   Object.defineProperties(data, {
+       name: { value: "Ivy", writable: true },
+       id: { value: 101, enumerable: false }
+   });
+   console.log(data.name); // "Ivy"
+   console.log(Object.keys(data)); // ["name"]
+   ```
+
+---
+
+### **6. Iterating Over Objects**
+
+**Definition**: Objects can be iterated using loops or methods like `for...in`, `Object.keys()`, `Object.values()`, or `Object.entries()`.
+
+**Explanation**: Iteration allows processing of object properties. `for...in` includes inherited enumerable properties, while `Object` methods focus on own properties.
+
+**Examples**:
+
+1. **Using `for...in`**:
+   ```javascript
+   const person = { name: "Jack", age: 40 };
+   for (let key in person) {
+       console.log(`${key}: ${person[key]}`);
+   }
+   // Output: name: Jack
+   //         age: 40
+   ```
+
+2. **Using `Object.keys()`**:
+   ```javascript
+   const book = { title: "Dune", author: "Herbert" };
+   console.log(Object.keys(book)); // ["title", "author"]
+   ```
+
+3. **Using `Object.values()`**:
+   ```javascript
+   const scores = { math: 90, science: 85 };
+   console.log(Object.values(scores)); // [90, 85]
+   ```
+
+4. **Using `Object.entries()`**:
+   ```javascript
+   const car = { make: "Honda", model: "Civic" };
+   for (let [key, value] of Object.entries(car)) {
+       console.log(`${key}: ${value}`);
+   }
+   // Output: make: Honda
+   //         model: Civic
+   ```
+
+5. **Using `forEach` with `Object.keys()`**:
+   ```javascript
+   const user = { name: "Kate", role: "Admin" };
+   Object.keys(user).forEach(key => {
+       console.log(`${key}: ${user[key]}`);
+   });
+   // Output: name: Kate
+   //         role: Admin
+   ```
+
+---
+
+### **7. Object Methods (Built-in)**
+
+**Definition**: JavaScript provides built-in methods on the `Object` constructor for manipulating objects, like `Object.assign()`, `Object.freeze()`, etc.
+
+**Explanation**: These methods help copy, freeze, or inspect objects, enhancing functionality and control.
+
+**Examples**:
+
+1. **Using `Object.assign()`**:
+   ```javascript
+   const target = { a: 1 };
+   const source = { b: 2 };
+   Object.assign(target, source);
+   console.log(target); // { a: 1, b: 2 }
+   ```
+
+2. **Using `Object.freeze()`**:
+   ```javascript
+   const obj = { name: "Liam" };
+   Object.freeze(obj);
+   obj.name = "Mia"; // Fails
+   console.log(obj.name); // "Liam"
+   ```
+
+3. **Using `Object.seal()`**:
+   ```javascript
+   const obj = { prop: 42 };
+   Object.seal(obj);
+   obj.prop = 100; // Works
+   obj.newProp = 50; // Fails
+   console.log(obj); // { prop: 100 }
+   ```
+
+4. **Using `Object.keys()`**:
+   ```javascript
+   const user = { id: 1, name: "Noah" };
+   console.log(Object.keys(user)); // ["id", "name"]
+   ```
+
+5. **Using `Object.hasOwnProperty()`**:
+   ```javascript
+   const person = { name: "Olivia" };
+   console.log(person.hasOwnProperty("name")); // true
+   console.log(person.hasOwnProperty("age")); // false
+   ```
+
+---
+
+### **8. Destructuring Objects**
+
+**Definition**: Object destructuring allows extracting properties into variables using a concise syntax.
+
+**Explanation**: Destructuring simplifies code by assigning properties to variables in one line, with support for default values and renaming.
+
+**Examples**:
+
+1. **Basic Destructuring**:
+   ```javascript
+   const user = { name: "Paul", age: 28 };
+   const { name, age } = user;
+   console.log(name, age); // "Paul", 28
+   ```
+
+2. **Renaming Variables**:
+   ```javascript
+   const person = { firstName: "Quinn" };
+   const { firstName: fname } = person;
+   console.log(fname); // "Quinn"
+   ```
+
+3. **Default Values**:
+   ```javascript
+   const obj = { name: "Rachel" };
+   const { name, age = 30 } = obj;
+   console.log(age); // 30
+   ```
+
+4. **Nested Destructuring**:
+   ```javascript
+   const user = { info: { name: "Sam", age: 35 } };
+   const { info: { name, age } } = user;
+   console.log(name, age); // "Sam", 35
+   ```
+
+5. **Destructuring in Function Parameters**:
+   ```javascript
+   function greet({ name, age }) {
+       return `Hello, ${name}, age ${age}!`;
+   }
+   const person = { name: "Tina", age: 22 };
+   console.log(greet(person)); // "Hello, Tina, age 22!"
+   ```
+
+---
+
+### **9. Object Spread and Rest Operators**
+
+**Definition**: The spread (`...`) operator copies or merges object properties, while the rest operator collects remaining properties.
+
+**Explanation**: Spread is used for cloning or merging objects, and rest is used in destructuring to gather unassigned properties.
+
+**Examples**:
+
+1. **Spread for Cloning**:
+   ```javascript
+   const original = { name: "Uma" };
+   const clone = { ...original };
+   console.log(clone); // { name: "Uma" }
+   ```
+
+2. **Spread for Merging**:
+   ```javascript
+   const obj1 = { a: 1 };
+   const obj2 = { b: 2 };
+   const merged = { ...obj1, ...obj2 };
+   console.log(merged); // { a: 1, b: 2 }
+   ```
+
+3. **Spread with Overrides**:
+   ```javascript
+   const defaults = { theme: "light", font: "Arial" };
+   const userPrefs = { theme: "dark" };
+   const settings = { ...defaults, ...userPrefs };
+   console.log(settings); // { theme: "dark", font: "Arial" }
+   ```
+
+4. **Rest in Destructuring**:
+   ```javascript
+   const user = { name: "Vera", age: 27, role: "User" };
+   const { name, ...rest } = user;
+   console.log(rest); // { age: 27, role: "User" }
+   ```
+
+5. **Combining Spread and Rest**:
+   ```javascript
+   const base = { id: 1, name: "Will" };
+   const { id, ...rest } = base;
+   const updated = { ...rest, name: "Xander" };
+   console.log(updated); // { name: "Xander" }
+   ```
+
+---
+
+### **10. JSON and Objects**
+
+**Definition**: JSON (JavaScript Object Notation) is a format for representing objects as strings, and JavaScript provides methods to convert between objects and JSON.
+
+**Explanation**: `JSON.stringify()` converts objects to JSON strings, and `JSON.parse()` converts JSON strings back to objects. Not all objects are JSON-serializable (e.g., functions are excluded).
+
+**Examples**:
+
+1. **Convert Object to JSON**:
+   ```javascript
+   const user = { name: "Yara", age: 29 };
+   const json = JSON.stringify(user);
+   console.log(json); // '{"name":"Yara","age":29}'
+   ```
+
+2. **Parse JSON to Object**:
+   ```javascript
+   const json = '{"title":"Zorba","author":"Kazantzakis"}';
+   const book = JSON.parse(json);
+   console.log(book.title); // "Zorba"
+   ```
+
+3. **Stringify with Formatting**:
+   ```javascript
+   const data = { name: "Zoe", scores: [90, 85] };
+   const formatted = JSON.stringify(data, null, 2);
+   console.log(formatted);
+   // {
+   //   "name": "Zoe",
+   //   "scores": [90, 85]
+   // }
+   ```
+
+4. **Handling Non-Serializable Properties**:
+   ```javascript
+   const obj = { name: "Alice", fn: () => {} };
+   const json = JSON.stringify(obj);
+   console.log(json); // '{"name":"Alice"}'
+   ```
+
+5. **Error Handling with `JSON.parse()`**:
+   ```javascript
+   try {
+       const invalid = '{name: "Bob"}'; // Invalid JSON
+       JSON.parse(invalid);
+   } catch (e) {
+       console.log("Invalid JSON:", e.message);
+   }
+   // Output: Invalid JSON: Unexpected token n in JSON at position 1
+   ```
+
+---
+
+
+## **Practice Questions for JavaScript Objects**
+
+### **1. Object Creation**
+
+1. Create an object representing a student using an object literal. Include properties for `name`, `grade`, and `id`.
+   - **Hint**: Use the `{}` syntax and define key-value pairs.
+
+2. Write a constructor function `Car` that creates car objects with `make` and `model` properties. Create two car instances.
+   - **Hint**: Use the `function` keyword and the `this` keyword inside the constructor.
+
+3. Create an object `pet` using `Object.create()` that inherits a method `describe` from a prototype object that returns "I am a pet".
+   - **Hint**: Define a prototype object with the method first, then use `Object.create()`.
+
+4. Define a `Book` class using ES6 class syntax with `title` and `author` properties. Instantiate two book objects.
+   - **Hint**: Use the `class` keyword and a `constructor` method.
+
+5. Create an object `laptop` using the `new Object()` syntax. Add properties `brand` and `price` dynamically.
+   - **Hint**: Start with `new Object()` and assign properties using dot or bracket notation.
+
+---
+
+### **2. Accessing and Modifying Properties**
+
+1. Given an object `user = { name: "Sam", age: 25 }`, write code to access the `name` property using dot notation.
+   - **Hint**: Use the `.` operator with the property name.
+
+2. Create an object `product` with a property `item-name: "Phone"`. Access `item-name` using bracket notation.
+   - **Hint**: Use `[]` with the property name as a string.
+
+3. Create an object `employee` with `id: 101`. Add a `department` property and set it to "HR".
+   - **Hint**: Use either dot or bracket notation to add the new property.
+
+4. Given an object `book = { title: "Dune", price: 15 }`, update the `price` to 20 and log the result.
+   - **Hint**: Assign a new value to the property using `=`.
+
+5. Create an object `cart = { item: "Shirt", quantity: 2 }`. Delete the `quantity` property and log the updated object.
+   - **Hint**: Use the `delete` operator.
+
+---
+
+### **3. Object Methods**
+
+1. Create an object `calculator` with a method `multiply` that takes two numbers and returns their product.
+   - **Hint**: Define a function as a property of the object.
+
+2. Create an object `person` with a `name` property and a `greet` method that returns "Hello, [name]!".
+   - **Hint**: Use `this` to access the object’s `name` property.
+
+3. Write an object `rectangle` with `width`, `height`, and an `area` method that calculates and returns the area.
+   - **Hint**: Use `this.width * this.height` inside the method.
+
+4. Create an object `game` and dynamically add a `start` method that returns "Game started!".
+   - **Hint**: Assign a function to a new property after creating the object.
+
+5. Create an object `counter` with a `count` property (initially 0) and an `increment` method that increases `count` by 1.
+   - **Hint**: Ensure the method modifies the object’s `count` property using `this`.
+
+---
+
+### **4. Object Prototypes and Inheritance**
+
+1. Define a constructor function `Animal` with a `name` property. Add a `speak` method to its prototype that returns "[name] makes a sound."
+   - **Hint**: Use `Animal.prototype` to add the method.
+
+2. Create a prototype object `vehicle` with a `drive` method. Use `Object.create()` to create a `car` object that inherits `drive`.
+   - **Hint**: Pass the prototype object to `Object.create()`.
+
+3. Create an `Animal` class with a `speak` method. Extend it with a `Dog` class that adds a `bark` method.
+   - **Hint**: Use `class`, `extends`, and `super` if needed.
+
+4. Create an object `obj` and set its prototype to an object with a `greet` method using `Object.setPrototypeOf()`.
+   - **Hint**: Define the prototype object first, then use `Object.setPrototypeOf()`.
+
+5. Given a constructor function `Person`, check if an instance’s prototype is `Person.prototype` using `Object.getPrototypeOf()`.
+   - **Hint**: Create an instance and compare its prototype.
+
+---
+
+### **5. Object Property Descriptors**
+
+1. Create an object with a read-only property `id` set to 100 using `Object.defineProperty()`.
+   - **Hint**: Use the `writable: false` descriptor.
+
+2. Define an object with a non-enumerable property `secret` using `Object.defineProperty()`. Verify it doesn’t appear in `Object.keys()`.
+   - **Hint**: Set `enumerable: false` in the descriptor.
+
+3. Create an object with a `name` property and add a getter and setter for `fullName` using `Object.defineProperty()`.
+   - **Hint**: Use `get` and `set` in the descriptor object.
+
+4. Create an object with a non-configurable property `constant` using `Object.defineProperty()`. Try deleting it and log the result.
+   - **Hint**: Set `configurable: false` and test with the `delete` operator.
+
+5. Use `Object.defineProperties()` to create an object with two properties: `name` (writable) and `id` (non-enumerable).
+   - **Hint**: Pass an object with multiple property descriptors to `Object.defineProperties()`.
+
+---
+
+### **6. Iterating Over Objects**
+
+1. Create an object `person = { name: "Alex", age: 30 }` and use a `for...in` loop to log all keys and values.
+   - **Hint**: Use the loop to access each property and its value.
+
+2. Given an object `book = { title: "1984", author: "Orwell" }`, use `Object.keys()` to log all property names.
+   - **Hint**: Call `Object.keys()` and iterate over the resulting array.
+
+3. Create an object `scores = { math: 95, science: 88 }` and use `Object.values()` to log all values.
+   - **Hint**: Use `Object.values()` to get an array of values.
+
+4. Given an object `car = { make: "Toyota", model: "Corolla" }`, use `Object.entries()` to log each key-value pair.
+   - **Hint**: Use a `for...of` loop with `Object.entries()`.
+
+5. Create an object `user = { name: "Beth", role: "Admin" }` and use `Object.keys().forEach()` to log each property.
+   - **Hint**: Combine `Object.keys()` with the `forEach` method.
+
+---
+
+### **7. Object Methods (Built-in)**
+
+1. Create two objects `obj1 = { a: 1 }` and `obj2 = { b: 2 }`. Use `Object.assign()` to merge them into a new object.
+   - **Hint**: Pass a new object `{}` as the target.
+
+2. Create an object `data = { name: "Cathy" }` and freeze it using `Object.freeze()`. Try modifying a property and log the result.
+   - **Hint**: Use `Object.freeze()` and test immutability.
+
+3. Create an object `obj = { prop: 42 }` and seal it using `Object.seal()`. Try adding and modifying properties, then log the result.
+   - **Hint**: Use `Object.seal()` and check what operations are allowed.
+
+4. Given an object `user = { id: 1, name: "Dan" }`, use `Object.keys()` to check if it has exactly two properties.
+   - **Hint**: Check the length of the array returned by `Object.keys()`.
+
+5. Create an object `person = { name: "Eve" }` and use `Object.hasOwnProperty()` to check if it has a `name` property.
+   - **Hint**: Call `hasOwnProperty()` with the property name as a string.
+
+---
+
+### **8. Destructuring Objects**
+
+1. Given an object `user = { name: "Frank", age: 35 }`, destructure `name` and `age` into variables and log them.
+   - **Hint**: Use the `{}` syntax to extract properties.
+
+2. Create an object `person = { firstName: "Grace" }` and destructure `firstName` into a variable named `fname`.
+   - **Hint**: Use a colon (`:`) to rename the variable.
+
+3. Destructure an object `book = { title: "Dune" }` to extract `title` and provide a default value for `author`.
+   - **Hint**: Use `=` in the destructuring syntax for defaults.
+
+4. Given an object `user = { info: { name: "Helen", age: 28 } }`, use nested destructuring to extract `name` and `age`.
+   - **Hint**: Use nested `{}` to access the inner object.
+
+5. Write a function that takes an object parameter and destructures `name` and `role` in the parameter list. Call it with an object.
+   - **Hint**: Define the function with `{ name, role }` as the parameter.
+
+---
+
+### **9. Object Spread and Rest Operators**
+
+1. Create an object `user = { name: "Ian" }` and use the spread operator to create a clone.
+   - **Hint**: Use `...` to copy all properties.
+
+2. Merge two objects `obj1 = { a: 1 }` and `obj2 = { b: 2 }` into a new object using the spread operator.
+   - **Hint**: Combine multiple objects with `...` in a new `{}`.
+
+3. Create an object `defaults = { theme: "light", font: "Arial" }` and override `theme` using the spread operator.
+   - **Hint**: Spread `defaults` and add a new `theme` property.
+
+4. Given an object `user = { name: "Jack", age: 30, role: "User" }`, use the rest operator to extract `name` and the remaining properties.
+   - **Hint**: Use `...rest` in destructuring.
+
+5. Combine spread and rest: Destructure `id` from an object and spread the rest into a new object with an updated property.
+   - **Hint**: Use destructuring with `...rest`, then spread `rest` into a new object.
+
+---
+
+### **10. JSON and Objects**
+
+1. Create an object `user = { name: "Kate", age: 27 }` and convert it to a JSON string using `JSON.stringify()`.
+   - **Hint**: Call `JSON.stringify()` with the object.
+
+2. Given a JSON string ` '{"title":"1984","author":"Orwell"}' `, parse it into an object and log the `title`.
+   - **Hint**: Use `JSON.parse()` and access the property.
+
+3. Convert an object `data = { name: "Liam", scores: [90, 85] }` to a formatted JSON string with indentation.
+   - **Hint**: Use `JSON.stringify()` with `null` and a number for spacing.
+
+4. Create an object with a function property and convert it to JSON. Log the result to see what happens.
+   - **Hint**: Check if the function appears in the JSON string.
+
+5. Write code to parse an invalid JSON string and handle any errors using a try-catch block.
+   - **Hint**: Use `try` and `catch` with `JSON.parse()`.
+
+---
+
