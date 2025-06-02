@@ -135,5 +135,3 @@ const users = [
 
 // console.log(allShort); // Output: true
 
-
-// https://grok.com/chat/b4f514c0-4aae-478f-9fd0-64054c891c73
