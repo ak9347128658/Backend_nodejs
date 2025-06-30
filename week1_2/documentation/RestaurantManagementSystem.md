@@ -10,6 +10,22 @@ The restaurant management system follows a simple architecture:
 2. **Service Layer**: Functions for CRUD operations on the data
 3. **UI Layer**: Console-based user interface
 
+### Architecture Diagram
+
+```
++---------------------+
+|     UI Layer        |
+|  (Console Interface)|
++----------+----------+
+           |
+           v
++----------+----------+      +-----------------+
+|   Service Layer     |      |                 |
+| (CRUD Operations)   +----->+ Data Layer      |
++----------+----------+      | (JSON Files)    |
+                             +-----------------+
+```
+
 ### File Structure
 
 ```
@@ -59,6 +75,22 @@ function initializeFiles() {
 ```
 
 ## CRUD Operations with Node.js fs Module
+
+### Data Flow Diagram
+
+```
++----------------+    +-----------------+    +----------------+
+| User Interface |    | Service Layer   |    |  File System   |
+|   (app.js)     |<-->|  (models.js)    |<-->|  (JSON Files)  |
++----------------+    +-----------------+    +----------------+
+        ^                     ^                      ^
+        |                     |                      |
+        v                     v                      v
++----------------+    +-----------------+    +----------------+
+| User Input     |    | Data Processing |    | Read/Write     |
+| & Display      |    | & Validation    |    | Operations     |
++----------------+    +-----------------+    +----------------+
+```
 
 ### Reading Data
 
@@ -138,6 +170,29 @@ The system maintains relationships between different entities:
 2. **Orders reference Menu Items**: Orders contain menu item IDs and quantities
 3. **Tables track Status**: Table status changes based on orders and reservations
 
+### Entity Relationship Diagram
+
+```
++----------------+       +----------------+       +----------------+
+|     Menu       |       |     Order      |       |     Table      |
++----------------+       +----------------+       +----------------+
+| - categories[] | <---- | - items[]      | ----> | - id           |
+| - items[]      |       | - tableId      |       | - seats        |
++----------------+       | - status       |       | - status       |
+                         | - total        |       +--------+-------+
+                         +-------+--------+                |
+                                 |                         |
+                                 v                         v
+                         +-------+--------+       +--------+-------+
+                         |    OrderItem   |       |  Reservation   |
+                         +----------------+       +----------------+
+                         | - menuItemId   |       | - tableId      |
+                         | - quantity     |       | - customerName |
+                         | - price        |       | - date         |
+                         +----------------+       | - partySize    |
+                                                  +----------------+
+```
+
 ### Console Interface
 
 The `app.js` file implements a console-based user interface using the `readline` module:
@@ -178,6 +233,30 @@ Orders and tables follow a status workflow:
 1. Tables: available → occupied → available
 2. Orders: pending → preparing → ready → served → completed
 
+### Order Status Workflow Diagram
+
+```
++-----------+     +-----------+     +---------+     +---------+     +------------+
+|  Pending  +---->| Preparing +---->|  Ready  +---->| Served  +---->| Completed  |
++-----------+     +-----------+     +---------+     +---------+     +------------+
+     ^                                                                    |
+     |                                                                    |
+     +--------------------------------------------------------------------+
+                           New order from same table
+```
+
+### Table Status Workflow Diagram
+
+```
++------------+     +-----------+
+| Available  +---->| Occupied  |
++-----+------+     +-----+-----+
+      ^                  |
+      |                  |
+      +------------------+
+      When order completed
+```
+
 ## Learning Objectives Demonstrated
 
 ### 1. File System Operations
@@ -198,6 +277,27 @@ Orders and tables follow a status workflow:
 - Creating a hierarchical menu system
 - Handling user input and validation
 - Displaying formatted data
+
+### System Flow Diagram
+
+```
++-------------------+    +-------------------+    +-------------------+
+| 1. System Start   +--->| 2. File System    +--->| 3. Load Initial   |
+|    app.js         |    |    Initialization |    |    Data           |
++-------------------+    +-------------------+    +--------+----------+
+                                                           |
+                                                           v
++-------------------+    +-------------------+    +--------+----------+
+| 6. Process User   |<---+ 5. User Input     |<---+ 4. Display Main   |
+|    Requests       |    |    via readline   |    |    Menu           |
++--------+----------+    +-------------------+    +-------------------+
+         |
+         v
++--------+----------+    +-------------------+    +-------------------+
+| 7. Service Layer  +--->| 8. File System    +--->| 9. Display        |
+|    Operations     |    |    Read/Write     |    |    Results        |
++-------------------+    +-------------------+    +-------------------+
+```
 
 ## Best Practices Implemented
 

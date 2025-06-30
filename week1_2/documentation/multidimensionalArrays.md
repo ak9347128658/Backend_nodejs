@@ -9,6 +9,44 @@ A multidimensional array is an array whose elements are also arrays. The most co
 - **Three-dimensional (3D) arrays**: Arrays of arrays of arrays (like multiple tables stacked together)
 - **N-dimensional arrays**: Can extend to any number of dimensions
 
+### Visual Representation of Multidimensional Arrays
+
+#### 1. One-Dimensional Array (For Comparison)
+```
++-----+-----+-----+-----+-----+
+|  0  |  1  |  2  |  3  |  4  |
++-----+-----+-----+-----+-----+
+```
+
+#### 2. Two-Dimensional Array (Matrix/Table)
+```
+         Columns
+      0     1     2     3
+    +-----+-----+-----+-----+
+  0 | 1,0 | 1,1 | 1,2 | 1,3 |
+    +-----+-----+-----+-----+
+R 1 | 2,0 | 2,1 | 2,2 | 2,3 |
+o   +-----+-----+-----+-----+
+w 2 | 3,0 | 3,1 | 3,2 | 3,3 |
+s   +-----+-----+-----+-----+
+  3 | 4,0 | 4,1 | 4,2 | 4,3 |
+    +-----+-----+-----+-----+
+```
+
+#### 3. Three-Dimensional Array (Cube)
+```
+           Layer 0                   Layer 1
+         Columns                  Columns
+      0     1     2            0     1     2
+    +-----+-----+-----+      +-----+-----+-----+
+  0 | 0,0,0| 0,0,1| 0,0,2|  0 | 1,0,0| 1,0,1| 1,0,2|
+    +-----+-----+-----+      +-----+-----+-----+
+R 1 | 0,1,0| 0,1,1| 0,1,2|  1 | 1,1,0| 1,1,1| 1,1,2|
+o   +-----+-----+-----+      +-----+-----+-----+
+w 2 | 0,2,0| 0,2,1| 0,2,2|  2 | 1,2,0| 1,2,1| 1,2,2|
+s   +-----+-----+-----+      +-----+-----+-----+
+```
+
 ## Creating Multidimensional Arrays
 
 ### 1. Creating a 2D Array (Matrix)
@@ -34,6 +72,28 @@ for (let i = 0; i < rows; i++) {
 }
 
 console.log(grid); // Output: [[0,0,0,0], [0,0,0,0], [0,0,0,0]]
+```
+
+### Memory Structure Diagram
+
+Here's how a 2D array is stored in JavaScript memory:
+
+```
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+Memory Representation:
++------------+     +-------+-------+-------+
+| matrix     |---->| [0]   | [1]   | [2]   |
++------------+     +---|---+---|---+---|---+
+                       |       |       |
+                       v       v       v
+                   +---+---+---+---+---+---+
+                   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+                   +---+---+---+---+---+---+---+---+---+
 ```
 
 ### 2. Creating a 3D Array
@@ -229,6 +289,26 @@ printBoard(board);
 //  O  -  - 
 ```
 
+#### Tic-Tac-Toe Board Visualization
+
+```
+Tic-Tac-Toe board array:
+board = [
+    [0, 1, 0],
+    [0, 2, 1],
+    [2, 0, 0]
+]
+
+Visual representation:
++-----+-----+-----+
+|     |  X  |     |
++-----+-----+-----+
+|     |  O  |  X  |
++-----+-----+-----+
+|  O  |     |     |
++-----+-----+-----+
+```
+
 ### Example 3: Data Analysis - Monthly Sales by Region
 
 ```javascript
@@ -268,6 +348,32 @@ function getTotalSalesForMonth(data, year, month) {
 let totalSalesFeb2024 = getTotalSalesForMonth(salesData, 1, 1);
 console.log(`Total sales for February 2024: $${totalSalesFeb2024}`);
 // Output: Total sales for February 2024: $42000
+```
+
+#### Sales Data Visualization
+
+```
+3D Sales Data Structure:
+
+          Year 0 (2023)                    Year 1 (2024)
+        +--------------+                 +--------------+
+        |              |                 |              |
+Month 0 | N    S    E  |       Month 0  | N    S    E  |
+(Jan)   |10000 15000 12000|     (Jan)   |11000 16500 13000|
+        |              |                 |              |
+        +--------------+                 +--------------+
+        |              |                 |              |
+Month 1 | N    S    E  |       Month 1  | N    S    E  |
+(Feb)   |12000 16000 11000|     (Feb)   |13000 17000 12000|
+        |              |                 |              |
+        +--------------+                 +--------------+
+        |              |                 |              |
+Month 2 | N    S    E  |       Month 2  | N    S    E  |
+(Mar)   |13000 17000 14000|     (Mar)   |14000 18000 15000|
+        |              |                 |              |
+        +--------------+                 +--------------+
+
+Accessing salesData[1][1][0] returns: 13000 (North region, February 2024)
 ```
 
 ## Performance Considerations
