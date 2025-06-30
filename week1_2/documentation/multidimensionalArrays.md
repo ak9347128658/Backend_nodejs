@@ -326,6 +326,123 @@ jaggedArray.forEach((row, index) => {
 });
 ```
 
+## Practice Questions
+
+### Question 1: Matrix Addition
+Write a function that takes two matrices (2D arrays) of the same size and returns a new matrix that is the sum of the two input matrices. Each element in the resulting matrix should be the sum of the corresponding elements in the input matrices.
+
+```javascript
+/*
+Example:
+matrix1 = [
+  [1, 2],
+  [3, 4]
+]
+matrix2 = [
+  [5, 6],
+  [7, 8]
+]
+Result should be:
+[
+  [6, 8],
+  [10, 12]
+]
+*/
+
+function matrixAddition(matrix1, matrix2) {
+  // Your code here
+}
+```
+
+### Question 2: Matrix Transpose
+Write a function that transposes a matrix (switches its rows and columns). For a matrix with m rows and n columns, the transposed matrix will have n rows and m columns.
+
+```javascript
+/*
+Example:
+matrix = [
+  [1, 2, 3],
+  [4, 5, 6]
+]
+Transposed result should be:
+[
+  [1, 4],
+  [2, 5],
+  [3, 6]
+]
+*/
+
+function transposeMatrix(matrix) {
+  // Your code here
+}
+```
+
+### Question 3: Chess Board Validator
+Create a function that takes an 8x8 chess board represented as a 2D array. Empty squares are represented by 0, white pieces by positive numbers (1-6), and black pieces by negative numbers (-1 to -6). The function should validate if the board is in a valid state according to these rules:
+- Each player should have exactly one king (6 for white, -6 for black)
+- There should be at most 8 pawns for each player
+- The total number of pieces for each player should not exceed 16
+
+```javascript
+function isValidChessBoard(board) {
+  // Your code here
+}
+```
+
+### Question 4: Restaurant Table Management System
+Implement a restaurant table management system using a 2D array to represent a dining area. Each element in the array represents a table, where 0 means the table is empty and 1 means it's occupied. Write functions to:
+1. Find the first available table for a party of a specific size
+2. Mark a table as occupied or empty
+3. Calculate the percentage of occupied tables
+
+```javascript
+// Restaurant floor map (0 = empty, 1 = occupied)
+let restaurantTables = [
+  [0, 1, 0, 1],  // Row 0 (tables for 2 people)
+  [1, 0, 0, 0],  // Row 1 (tables for 4 people)
+  [0, 0, 1, 0]   // Row 2 (tables for 6 people)
+];
+
+function findAvailableTable(tables, partySize) {
+  // Your code here
+}
+
+function updateTableStatus(tables, row, col, isOccupied) {
+  // Your code here
+}
+
+function getOccupancyRate(tables) {
+  // Your code here
+}
+```
+
+### Question 5: Image Processing - Pixel Manipulation
+Create a function that takes a 2D array representing an image (where each element is a pixel value from 0-255) and performs a simple image processing operation like:
+1. Inverting the colors (255 - pixelValue)
+2. Applying a threshold (if pixelValue > threshold, set to 255, else 0)
+3. Creating a mirror image (reversing each row)
+
+```javascript
+// Example grayscale image as 2D array (0-255 values)
+let image = [
+  [34, 56, 123, 145],
+  [76, 89, 145, 190],
+  [156, 167, 200, 222]
+];
+
+function invertImage(image) {
+  // Your code here
+}
+
+function thresholdImage(image, threshold) {
+  // Your code here
+}
+
+function mirrorImage(image) {
+  // Your code here
+}
+```
+
 ## Conclusion
 
 Multidimensional arrays are powerful data structures that allow you to organize and work with complex datasets in your Node.js backend applications. By understanding how to create, access, and manipulate these arrays, you can solve a wide range of programming challenges efficiently.
@@ -337,3 +454,5 @@ As you build more complex backend systems, you'll find multidimensional arrays i
 - Building game states and simulation environments
 
 Remember to consider performance implications when working with large multidimensional arrays, and always choose the most appropriate data structure for your specific use case.
+
+Work through the practice questions above to strengthen your understanding of multidimensional arrays and their applications in real-world scenarios.
