@@ -20,7 +20,7 @@ The fs module provides both synchronous and asynchronous methods for file operat
 
 - **Synchronous methods** block the execution of the program until the operation is completed. They end with "Sync" (e.g., `readFileSync`).
 - **Asynchronous methods** don't block the program execution. They take a callback function that is called when the operation is completed.
-- **Promise-based methods** are available via `fs.promises` for working with promises instead of callbacks.
+- **Promise-based methods** are available via `fs.promises` for working with promises instead of callbacks. For detailed information on working with Promises and async/await, refer to the separate documentation on asynchronous programming in Node.js.
 
 ## Common File System Operations
 
@@ -347,6 +347,176 @@ fs.access('file.txt', fs.constants.F_OK, (err) => {
 3. **Buffer size**: Consider adjusting the buffer size when working with streams for optimal performance.
 4. **Batch operations**: Group multiple file operations together when possible to reduce overhead.
 
+## Practice Questions
+
+Here are some practice exercises to help you master the Node.js File System module:
+
+### Question 1: File Reader
+
+Create a Node.js script that reads a text file and outputs the following statistics:
+- Total number of lines
+- Total number of words
+- Total number of characters
+- Five most frequently used words
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+
+function analyzeTextFile(filePath) {
+  // Your code here
+}
+
+analyzeTextFile('sample.txt');
+```
+
+### Question 2: Directory Explorer
+
+Create a function that recursively lists all files in a directory and its subdirectories, outputting the file paths organized by their extension.
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+const path = require('path');
+
+function exploreDirectory(dirPath) {
+  // Your code here
+}
+
+exploreDirectory('./project');
+```
+
+### Question 3: File Backup System
+
+Create a script that watches a specific file or directory for changes and automatically creates timestamped backup copies whenever changes are detected.
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+const path = require('path');
+
+function createBackupSystem(targetPath) {
+  // Your code here
+}
+
+createBackupSystem('./important-document.txt');
+```
+
+### Question 4: CSV to JSON Converter
+
+Create a utility that reads a CSV file and converts it to a JSON file. Allow the user to specify the input and output file paths.
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+
+function convertCsvToJson(csvFilePath, jsonFilePath) {
+  // Your code here
+}
+
+convertCsvToJson('data.csv', 'data.json');
+```
+
+### Question 5: Log Rotation System
+
+Implement a log rotation system that:
+- Appends messages to a log file
+- When the log file reaches a certain size (e.g., 1MB), it renames the current log file with a timestamp and creates a new empty log file
+- Maintains only the N most recent log files, deleting older ones
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+const path = require('path');
+
+class LogRotator {
+  constructor(logFilePath, maxSizeBytes, maxFiles) {
+    this.logFilePath = logFilePath;
+    this.maxSizeBytes = maxSizeBytes;
+    this.maxFiles = maxFiles;
+  }
+
+  log(message) {
+    // Your code here
+  }
+
+  rotateLogsIfNeeded() {
+    // Your code here
+  }
+
+  cleanupOldLogs() {
+    // Your code here
+  }
+}
+
+const logger = new LogRotator('./app.log', 1024 * 1024, 5);
+logger.log('This is a log message');
+```
+
+### Question 6: File Encryption/Decryption Tool
+
+Create a utility that can encrypt and decrypt files using a password-based encryption algorithm.
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+const crypto = require('crypto');
+
+function encryptFile(inputFilePath, outputFilePath, password) {
+  // Your code here
+}
+
+function decryptFile(inputFilePath, outputFilePath, password) {
+  // Your code here
+}
+
+// Example usage:
+// encryptFile('sensitive.txt', 'sensitive.enc', 'mySecretPassword');
+// decryptFile('sensitive.enc', 'sensitive_decrypted.txt', 'mySecretPassword');
+```
+
+### Question 7: Configuration File Manager
+
+Create a utility class that manages application configuration stored in a JSON file:
+- Can read and parse the configuration
+- Can update specific configuration settings
+- Validates the configuration against a schema
+- Maintains a backup of the previous configuration when changes are made
+
+```javascript
+// Example solution outline:
+const fs = require('fs');
+
+class ConfigManager {
+  constructor(configFilePath, schemaFilePath) {
+    this.configFilePath = configFilePath;
+    this.schemaFilePath = schemaFilePath;
+  }
+
+  loadConfig() {
+    // Your code here
+  }
+
+  updateConfig(key, value) {
+    // Your code here
+  }
+
+  validateConfig(config) {
+    // Your code here
+  }
+
+  backupConfig() {
+    // Your code here
+  }
+}
+
+const configManager = new ConfigManager('./config.json', './config-schema.json');
+const config = configManager.loadConfig();
+configManager.updateConfig('apiUrl', 'https://api.example.com/v2');
+```
+
 ## Conclusion
 
 The fs module in Node.js provides a comprehensive set of tools for working with files and directories. By understanding how to use its various methods effectively, you can build applications that efficiently manage file I/O operations. Remember to use asynchronous methods for better performance and always handle errors properly to ensure your application is robust and reliable.
+
+Working through the practice questions above will help you apply these concepts in real-world scenarios and build your confidence in using the Node.js File System module for various file manipulation tasks.
