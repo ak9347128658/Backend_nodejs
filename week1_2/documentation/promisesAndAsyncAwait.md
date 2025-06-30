@@ -15,6 +15,45 @@ A Promise can be in one of three states:
 - **Fulfilled**: The operation completed successfully, and the Promise has a resulting value.
 - **Rejected**: The operation failed, and the Promise has a reason for the failure.
 
+### Promise Lifecycle Diagram
+
+```
+                  +-------------+
+                  |   Promise   |
+                  |  Creation   |
+                  +------+------+
+                         |
+                         v
+                  +------+------+
+                  |   Pending   |<--------+
+                  | (in progress)|        |
+                  +------+------+         |
+                         |                |
+          +---------------+----------------+
+          |                                |
+          v                                v
+  +-------+-------+               +--------+------+
+  |   Fulfilled   |               |   Rejected    |
+  | (resolved with|               | (rejected with|
+  |    a value)   |               |  a reason)    |
+  +-------+-------+               +--------+------+
+          |                                |
+          v                                v
+  +-------+-------+               +--------+------+
+  | .then() handler|              | .catch() handler|
+  | processes the |               | processes the |
+  |     value     |               |     error     |
+  +---------------+               +---------------+
+          |                                |
+          +----------------+---------------+
+                           |
+                           v
+                    +------+------+
+                    |  .finally() |
+                    |   (optional)|
+                    +-------------+
+```
+
 ### Creating Promises
 
 ```javascript
@@ -90,6 +129,30 @@ getUserData(123)
   });
 ```
 
+### Promise Chaining Diagram
+
+```
++----------------+    +----------------+    +------------------+
+| getUserData(123) |    | getUserPosts(user) |    | Log posts to console |
+| returns Promise1 +--->| returns Promise2 +--->| and handle results  |
++----------------+    +----------------+    +------------------+
+        |                     |                      |
+        v                     v                      v
++----------------+    +----------------+    +------------------+
+| Promise1 resolves |    | Promise2 resolves |    | Final result shown |
+| with user data   |    | with posts data   |    | in the console    |
++----------------+    +----------------+    +------------------+
+                                                     |
++----------------------------------------------------|
+|
+v
++------------------+
+| Any error in the |
+| chain is caught  |
+| by .catch()      |
++------------------+
+```
+
 ### Promise.all - Parallel Execution
 
 When you need to run multiple promises concurrently and wait for all of them to complete:
@@ -109,6 +172,46 @@ Promise.all([promise1, promise2, promise3])
   });
 ```
 
+### Promise.all Diagram
+
+```
+                         +---------------+
+                         | Promise.all() |
+                         +-------+-------+
+                                 |
+         +-------------------+---+----------------+
+         |                   |                    |
++--------v------+    +-------v-------+    +-------v-------+
+|  Promise 1    |    |   Promise 2   |    |   Promise 3   |
+| (takes 1s)    |    |  (takes 2s)   |    |  (takes 1.5s) |
++--------+------+    +-------+-------+    +-------+-------+
+         |                   |                    |
+         |                   |                    |
++--------v------+    +-------v-------+    +-------v-------+
+| Resolves after |    | Resolves after|    | Resolves after|
+|    1 second    |    |   2 seconds   |    |  1.5 seconds  |
++--------+------+    +-------+-------+    +-------+-------+
+         |                   |                    |
+         +-------------------+--------------------+
+                             |
+                             v
+                    +--------+--------+
+                    |    Promise.all  |
+                    |    resolves     |
+                    |  after 2 seconds|
+                    | (longest time)  |
+                    +-----------------+
+                             |
+                             v
+                    +--------+--------+
+                    | Returns array of|
+                    |  all results:   |
+                    | ['Result 1',    |
+                    |  'Result 2',    |
+                    |  'Result 3']    |
+                    +-----------------+
+```
+
 ### Promise.race - First to Complete
 
 When you need only the result of the first promise to resolve:
@@ -126,6 +229,42 @@ Promise.race([promise1, promise2, promise3])
   .catch(error => {
     console.error('First promise to complete was rejected:', error);
   });
+```
+
+### Promise.race Diagram
+
+```
+                         +----------------+
+                         | Promise.race() |
+                         +-------+--------+
+                                 |
+         +-------------------+---+----------------+
+         |                   |                    |
++--------v------+    +-------v-------+    +-------v-------+
+|  Promise 1    |    |   Promise 2   |    |   Promise 3   |
+| (takes 1s)    |    |  (takes 0.5s) |    |  (takes 1.5s) |
++--------+------+    +-------+-------+    +-------+-------+
+         |                   |                    |
+         |                   |                    |
+         |            +------v-------+            |
+         |            | Resolves FIRST|            |
+         |            | after 0.5s    |            |
+         |            +------+-------+            |
+         |                   |                    |
+         |                   v                    |
+         |            +------+-------+            |
+         +----------->|  Promise.race |<-----------+
+                      |    resolves   |
+                      | with 'Result 2'|
+                      +--------------+
+                             |
+                             v
+                      +------+-------+
+                      | Other promises|
+                      | continue but  |
+                      | their results |
+                      | are ignored   |
+                      +--------------+
 ```
 
 ### Promise.allSettled - All Results Regardless of Outcome
@@ -153,6 +292,32 @@ Promise.allSettled([promise1, promise2, promise3])
 ## Understanding Async/Await
 
 Async/await is a syntactic sugar built on top of Promises, making asynchronous code look and behave more like synchronous code while maintaining its non-blocking benefits.
+
+### Async/Await vs Promises Diagram
+
+```
+                 Promises                     |               Async/Await
+--------------------------------------------|------------------------------------------
+                                           |
+getUserData(123)                           |  async function getUserInfo() {
+  .then(user => {                          |    try {
+    console.log(user);                     |      const user = await getUserData(123);
+    return getUserPosts(user);             |      console.log(user);
+  })                                       |
+  .then(posts => {                         |      const posts = await getUserPosts(user);
+    console.log(posts);                    |      console.log(posts);
+    return getUserFriends(posts.user);     |
+  })                                       |      const friends = await getUserFriends(user);
+  .then(friends => {                       |      console.log(friends);
+    console.log(friends);                  |      return { user, posts, friends };
+    return { user: posts.user,             |
+             posts: posts,                 |    } catch (error) {
+             friends: friends };           |      console.error('Error:', error);
+  })                                       |    }
+  .catch(error => {                        |  }
+    console.error('Error:', error);        |
+  });                                      |
+```
 
 ### Basic Syntax
 
@@ -434,6 +599,33 @@ async function processInParallel(items) {
 }
 ```
 
+### Parallel vs Sequential Execution Diagram
+
+```
+      Sequential Execution                  |          Parallel Execution
+--------------------------------------------|------------------------------------------
+                                           |
+async function processSequentially() {      |  async function processInParallel() {
+  const result1 = await operation1();      |    const promise1 = operation1();
+  // Wait for operation1 to complete       |    const promise2 = operation2();
+  // before starting operation2            |    const promise3 = operation3();
+  const result2 = await operation2();      |    // All operations started immediately
+  // Wait for operation2 to complete       |    
+  // before starting operation3            |    // Now wait for all to complete
+  const result3 = await operation3();      |    const [result1, result2, result3] =
+                                           |      await Promise.all([promise1, promise2, promise3]);
+  return [result1, result2, result3];      |    
+}                                          |    return [result1, result2, result3];
+                                           |  }
+Timeline:                                  |  Timeline:
+                                           |
+Operation1  |====>|                        |  Operation1  |====>|
+Operation2         |====>|                 |  Operation2  |=========>|
+Operation3                |====>|          |  Operation3  |=====>|
+                                           |
+Total time: Sum of all operations          |  Total time: Duration of longest operation
+```
+
 **Controlled Parallel Execution (Limited concurrency):**
 
 ```javascript
@@ -521,28 +713,44 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3, delay = 1000) {
 
 ## Common Pitfalls and Best Practices
 
-### Common Mistakes
+## Error Handling Best Practices
 
-1. **Forgetting to handle errors:**
+### Error Flow Diagram
 
-   ```javascript
-   // Bad - no error handling
-   async function riskyFunction() {
-     const data = await fetchData();
-     return processData(data);
-   }
-   
-   // Good - with error handling
-   async function safeFunction() {
-     try {
-       const data = await fetchData();
-       return processData(data);
-     } catch (error) {
-       console.error('Error in safeFunction:', error);
-       throw error;
-     }
-   }
-   ```
+```
+                               +---------------+
+                               | Async Function |
+                               +-------+-------+
+                                       |
+                                       v
+                               +-------+-------+
+                               |  Try Block    |
+                               +-------+-------+
+                                       |
+                     +------------------+-------------------+
+                     |                                      |
+                     v                                      v
+          +----------+-----------+             +------------+----------+
+          | Successful Execution |             | Error Occurs          |
+          +----------+-----------+             +------------+----------+
+                     |                                      |
+                     v                                      v
+          +----------+-----------+             +------------+----------+
+          | Return Value         |             | Control jumps to      |
+          | (wrapped in Promise) |             | catch block           |
+          +---------------------+             +------------+----------+
+                                                          |
+                                                          v
+                                              +------------+----------+
+                                              | Error Handling Logic  |
+                                              +------------+----------+
+                                                          |
+                                              +-----------+------------+
+                                              | Either: Recover,       |
+                                              | Return fallback value, |
+                                              | or Re-throw error      |
+                                              +----------------------+
+```
 
 2. **Forgetting that async functions always return Promises:**
 
