@@ -12,4 +12,3 @@ let grades = [
 const student1ScicenceMark = grades[0][1];
 console.log(`Student 1's Science mark: ${student1ScicenceMark}`); // Output: 90
 
-// https://grok.com/chat/09476d28-65cc-4810-9907-07b7413a3711
