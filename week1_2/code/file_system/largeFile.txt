@@ -1,0 +1,707 @@
+// let allows reassigning values; const does not
+// var is an older way of declaring variables and is not recommended 
+
+// primitve types: string, number, boolean, null, undefined
+// reference types: object, array, function
+
+// let name = "John"; // string
+
+// we call let as a variable
+// name as reference to the value "John"
+// = is the assignment operator
+// John is the value
+// console.log(name);
+
+// name = "Doe"; // reassigning the value of name
+// console.log(name);
+
+// const age = 25; // number
+// console.log(age);
+// age = 30; // error: age is a constant and cannot be reassigned
+// console.log(age);
+
+// conclusion:
+// let is for values that can change
+// const is for values that cannot change
+
+
+// 1. Primitive Data Types
+// ==> String: Represents textual data encloed in a single ('') or double ("") quotes
+
+// let name = "John Doe"; // String
+
+// // ==> Number: Represents numeric values, both integers and floating-point numbers
+// let age = 25; // Number
+// let height = 5.9; // Number (floating-point)
+
+// // ==> Boolean: Represents a logical entity and can have two values: true or false
+// let isStudent = true; // Boolean
+// let isEmployed = false; // Boolean
+
+// // ==> Null: Represents the intentional absence of any object value. It is a primitive value that represents "nothing" or "no value"
+// let emptyValue = null; // Null
+
+// // ==> Undefined: Represents a variable that has been declared but has not yet been assigned a value. It is a type itself (undefined)
+// let notAssigned; // Undefined
+
+// 2. Non-Primitive Data Types
+
+// ==> Object: Represents a collection of key-value pairs. Objects can store multiple values as properties
+
+// let person = {
+//     name: "John Doe",
+//     age: 25,
+//     isStudent: true
+// }  // an object with properties name, age, and isStudent
+
+// console.log(person)
+// // print the value of name property
+// console.log(person.name) // John Doe
+// // print the value of age property
+// console.log(person.age) // 25
+
+// ==> Array: Represents a list-like collection of values. Arrays can store multiple values in a single variable
+// let fruits = ["apple", "banana", "orange", "grape", "mango", "kiwi"] // an array of fruits
+// console.log(fruits);
+
+// how to print the first element of the array
+// console.log(fruits[0]); // apple
+// what is the index of grape
+// console.log(fruits[3]); // grape
+
+// Function: Represents a block of code that can be called and executed. Functions can take parameters and return values
+
+// function helloworld() {
+//     console.log("Hello, World!");
+// }
+
+// helloworld();
+// helloworld();
+// helloworld();
+// helloworld();
+
+// Function with parameters
+// function greet(name) {
+//     console.log("Hello, " + name + "!");
+// }
+
+// greet("John Doe");
+// greet("Jane Smith");
+// greet("Alice Johnson");
+
+// Function with multiple parameters
+// function add(a,b){
+//     console.log(a + b);
+// }
+
+// add(5, 10); // 15
+
+// function with mutiple parameters with different data types
+// function add(a, b, c) {
+//     console.log(a + b + c);
+// }
+
+// add(5, 10, 15.4); // 30
+
+
+// Function with return value with parameters
+
+// function calculateSquare(number) {
+//     return number * number;
+// }
+
+// const calculatedSquareValue = calculateSquare(5); // 25
+// const calculatedSquareValue2 = calculateSquare(10); // 100
+// const calculatedSquareValue3 = calculateSquare(15); // 225
+// console.log(calculatedSquareValue); // 25
+// console.log(calculatedSquareValue2); // 100
+// console.log(calculatedSquareValue3); // 225
+
+
+// const calculateSquare = (a,b) => {
+//     console.log("Calculating square of " + a + " and " + b);
+//   return a * b;
+// }
+
+// const calculatedSquareValue = calculateSquare(5, 10); // 50
+// console.log(calculatedSquareValue); // 50
+
+// const calculateSquare = (a,b) => a * b;
+
+// const calculatedSquareValue = calculateSquare(5, 10); // 50
+// console.log(calculatedSquareValue); // 50
+
+
+
+// Var: var is function scoped, meaning it is accessible within the function in which it is declared
+
+// function exampleVar() {
+//     let y =10;
+//     var x = 20;
+//     const z = 30;
+//     if(true){
+//        var x = 10;
+//        let y = 20;
+//        z = 40;
+//     }
+//     console.log(x);
+//     console.log(y); // ReferenceError: y is not defined 
+//     console.log(z); // ReferenceError: z is not defined
+// }
+
+// exampleVar(); // I am in true condition
+
+
+// Javascript Conditional Control Statements: if ,else if, else, switch
+
+// if(condition1){
+//   // code to execute if condition1 is true then other 3 conditions will not be executed else if with condition2,condition3 and else 
+// }else if(condition2){
+//   // code to execute if condition2 is true then other 2 conditions will not be executed else if with condition3 and else also if condition1 will not be executed
+// }else if(condition3){
+//   // code to execute if condition3 is true then other 1 conditions will not be executed else if with condition2 and else also if condition1 will not be executed
+// }else{
+//   // code to execute if all conditions are false
+// }
+
+// let name = "EXAMPE NAME";
+
+// if(name == "John Doe"){  // true
+//     console.log("from if with condition1");
+// }else if(name == "Jane Doe"){
+//     console.log("from else if with condition2");
+// }
+// else if(name == "Jane Doe"){
+//     console.log("from else if with condition3");
+// }else{
+//     console.log("from else with condition4");
+// }
+
+// console.log("i am executed.")
+
+
+// Switch Statement
+// syntax:
+
+// switch(expression) {
+//     case value1:
+//         // code block to be executed if expression === value1
+//         break;
+//     case value2:
+//         // code block to be executed if expression === value2
+//         break;
+//     default:
+//         // code block to be executed if none of the cases match
+// }
+
+// let fruit = "banana";
+// // switch statement will take less time comparing to if else statement
+// switch (fruit) {
+//     case "apple":
+//         console.log("This is an apple.");
+//         break;
+//     case "banana":
+//         console.log("This is a banana.");
+//         break;
+//     case "orange":
+//         console.log("This is an orange.");
+//         break;
+//     default:
+//         console.log("Unknown fruit.");
+//         break;
+// }
+
+// example of switch statement with break and continue
+// let day = 3; 
+// let dayName = "tuesday";
+
+// switch (day) {
+//     case 1:
+//         dayName = "Monday";
+//         console.log("Today is Monday");
+//         break;
+//     case 2:
+//         dayName = "Tuesday";
+//         console.log("Today is Tuesday");
+//         break;
+//     case 3:
+//         dayName = "wed";
+//         if(false){
+//             break;
+//         }
+//     case 3:
+//         dayName = "Wednesday";
+//         console.log("Today is Wednesday");
+//         break;
+//     case 4:
+//         dayName = "Thursday";
+//         console.log("Today is Thursday");
+//         break;
+//     case 5:
+//         dayName = "Friday";
+//         console.log("Today is Friday");
+//         break;
+//     case 6:
+//         dayName = "Saturday";
+//         console.log("Today is Saturday");
+//         break;
+//     case 7:
+//         dayName = "Sunday";
+//         console.log("Today is Sunday");
+//         break;
+//     default:
+//         dayName = "Invalid day";
+// }
+
+// Nested If Statement: Nested if statements are used when you need to check Multiple conditions sequentially.
+
+// Basic Syntax:
+
+// if (condition1) {
+//     if(condition2){
+       
+//         if(condition3){
+//             // code to execute if condition1, condition2 and condition3 are true
+//         }
+
+//     }
+
+//     if(condition4){
+//         // code to execute if condition1 and condition4 are true
+//     }
+//         // code to execute if condition1 and condition4 are true
+// }
+
+// Example of Nested If Statement:
+// let age = 16;
+// let hasLicense = false;
+
+// if (age >= 18) {
+//    if (hasLicense) {
+//         console.log("You are eligible to drive.");
+//     }else{
+//         console.log("You are not eligible to drive.");
+//     }
+// }else{
+//     console.log("You are too young to drive.");
+// }
+
+// Example 2: Nested if-Else statements:
+// let score = 65;
+// let grade;
+
+// if (score >= 90) { // true
+//     grade = "A";
+// }else{
+//   if (score >= 80) {
+//         grade = "B";
+//     }else{
+//         if(score >= 70) {
+//             grade = "C";
+//         }else{
+//            if(score >= 60) {
+//                 grade = "D";
+//             }else{
+//                 grade = "F";
+//             }
+//         }
+//     }
+// }
+
+// console.log("Your grade is: " + grade); 
+
+// Example 3: User Authentication
+// let username = "sdfsadfs";
+// let password = '1234dfgkl';
+// let isAuthenticated = false;
+
+// if (username === "admin") { 
+//   if(password === "1234") {
+//         isAuthenticated = true;
+//         console.log("Authentication successful."+ " Welcome, " + username + "!");
+//     }else{
+//         console.log("Invalid password.");
+//     }
+// }else{
+//     console.log("Invalid username");
+// }
+
+// Nested Function: Nested functions are functions defined inside other functions.
+
+// syntax:
+// function outerFunction() {
+//     let outerVariable = "I am an outer variable";
+//     function innerFunction() {
+//         // code to be executed
+//         console.log(outerVariable); // accessing outer variable
+//     }
+//     innerFunction(); // calling the inner function
+// }
+
+// outerFunction();
+// outerFunction();
+
+
+// Operators in Javascript are symbols that tell our interpreter to perform logical operations, mathematical operations, or conditional operations.
+
+// 1.Binary Operator: This Operator has two operands, where the operator is in between these two operands.
+
+// 2. Unary Operator: This Operator has a single operand and the operator is either before the operand or after the operand.
+
+
+// Types of Operators in Javascript
+
+// 1. Assignment Operator
+
+// 2. Arithemetic Operator
+
+// 3. Comparison Operator
+
+// 4. conditional Operator. (Special Operator ternary operator)
+
+// 5. Logical Operator
+
+// 1.Assignment Operator: The job of the Assignment Operator is to assign a value to a variable. The assignment operator is represented by the equal sign (=). The assignment operator can also be used to assign values to variables in a single line of code. For example, you can assign a value to a variable and then use that variable in an expression.
+
+// Example: a = b which means a holds the value of b.(value of b is assigned to a)
+// let a = 10;
+// let b = 5;
+
+// console.log(a); 
+// a = b; 
+
+// a = a+b; // 5 + 5 = 10
+
+// a = a-b; // 10 - 5 = 5
+
+// a = a*b; // 5 * 5 = 25
+
+// a = a/b; // 25 / 5 = 5
+
+// console.log(a); 
+
+
+// 2> Arithemetic Operator:The job of the Arithmetic Operator is to perform an Arithmetic operation on two numeric operands either can be literals or can be variables.
+// After performing the the Arithmetic Operation it provides a single numerical value;
+//  Basic Arithmetic Operators are: + , - , * , / , %(modular operatior) , ++ , --
+
+// a = b + c 
+// a = b - c
+// a = b * c
+// a = b / c
+// a = b % c
+
+// Example:
+// let a = 10;
+// let b = 5;
+// let c;
+
+// c = a+ b;
+
+// c = a - b;
+
+// c = a * b;
+
+// c = a / b;
+
+// c = a % b;
+
+// c = a++;
+
+// c = ++a;
+
+// c = a--;
+
+// c = --a;
+// console.log(c); 
+
+
+// 3. Comparison Operator
+// As the name suggests this operator’s Job is to compare the values of operands and return a logical value only if the comparison is true.
+// These operands can be anything it can be string, number, object values.
+// Conditional operators are mostly used with if-else, else if for comparing and returning required results.
+
+// Basic Comparison Operators are: == , === , != , !== , > , < , >= , <=
+
+// Example:
+
+// let a = 7;
+// let b = 3;
+// let c = "3";
+// let d = 7;
+// let e; //stroing output of comparison
+
+// e = a == b; // 7 == 3 = false
+
+// e = b == c; // 3 == "3" = true
+
+// e = a === d; // 7 === 7 = true
+
+// e = b === c; // 3 === "3" = false
+
+// e = c !== b;  // "3" !== 3 = !true = false
+
+// e = a > b;  // 7 > 3 = true
+
+// console.log(e); // true
+
+// 4. Conditional Operator: The conditional operator is also known as the ternary operator. It is a shorthand way of writing an if-else statement. It takes three operands and returns one of the two values based on the condition.
+
+// Example:
+
+// let a = true;
+// let b = false;
+
+// a ? console.log("A") : console.log("B");
+
+// b ? console.log("A") : console.log("B");
+
+// complex condition example for ternary operator:
+
+// let a = 10;
+// let b = 20;
+// let c = 30;
+// let d = 40;
+
+
+// a > b ? console.log("A") : b > c ? console.log("B") : c > d ? console.log("C") : console.log("D");
+
+
+// 5. Logical Operator: The job of a logical operator is to compare two sets of opeations and then return the Boolean value true or false depending on an operator to operate.
+
+//  Logical operators are: && (AND) , || (OR) , !(NOT)
+
+// There are three types of logical operators:
+
+// 1.Logical AND denoted as && which compares two conditions or operands and returns value only if both of them are true.
+
+// 2.Logical OR denoted as || which compares two conditions or operands and returns a value if any one of the two conditions is true.
+
+// 3.Logical NOT denoted as ! which compares two operands and returns a value if not equal true if equal then false.
+
+
+// Example 1(AND operator):
+
+// let a = 7;
+// let b = 3;
+
+// // AND operator
+// if(a > 5 && b < 2) {
+//  console.log("TRUE");
+// }else{
+//  console.log("FALSE");
+// }
+
+
+
+// Exampe 2 (OR operator):
+
+// let a = 7;
+// let b = 3;
+
+// if(a > 5 || b < 2) {
+//  console.log("TRUE");
+// }else{
+//     console.log("FALSE");
+// }
+
+// if(b < 2 || a > 5) {
+//  console.log("TRUE");
+// }else{
+//     console.log("FALSE");
+// }
+
+// if(b < 2 || a > 8) {
+//  console.log("TRUE");
+// }else{
+//     console.log("FALSE");
+// }
+
+// Example 3 (NOT operator):
+
+// let a = 7;
+// let b = 3;
+
+// if(!(a > 5)) {
+//     console.log("TRUE");
+// }
+// else{
+//     console.log("FALSE");
+// }
+
+
+// typeof: This operator return the type of the variable value that is a string,number,boolean,object,etc.
+
+// Example:
+// let a = 10;
+// let b = "hello";
+// let c = true;
+
+// let e = typeof a;
+
+// let f = typeof b;
+
+// let g = typeof c;
+
+// console.log(e); // number
+// console.log(f); // string
+// console.log(g); // boolean
+
+// Polymorphism: Polymorphism allows objects of different types to be treated as instances of a common type,often by overriding inherited methods to provide specific behavior.
+
+// Example 1: Polymrophism with method overriding
+// class Shape{
+//     constructor(){
+
+//     }
+//     getArea() {
+//         return 0;
+//     }
+// }
+
+// class Circle extends Shape{
+//     constructor(radius){
+//         super();
+//         this.radius = radius;
+//     }
+//     getArea() {
+//         return Math.PI * this.radius * this.radius;
+//     }
+// }
+
+// class Rectangle extends Shape{
+//     constructor(width, height){
+//         super();
+//         this.width = width;
+//         this.height = height;
+//     }
+//     getArea() {
+//         return this.width * this.height;
+//     }
+// }
+
+// const circle = new Circle(5);
+// const rectangle = new Rectangle(4, 6);
+
+// console.log(circle.getArea()); // Output: 78.53981633974483
+// console.log(rectangle.getArea()); // Output: 24
+
+// Example 2: Polymorphism
+// class Notification {
+//     constructor(receiver){
+//         this.receiver = receiver;
+//     }
+
+//     send(){
+//         console.log(`Sending notification to ${this.receiver}`);
+//     }
+// }
+
+// class SMSNotification extends Notification {
+//     constructor(receiver, message){
+//         super(receiver);
+//         this.message = message;
+//     }
+
+//     send(){
+//         console.log(`Sending SMS to ${this.receiver}: ${this.message}`);
+//     }
+// }
+
+// const smsNotification = new SMSNotification('Jane Doe', 'Hello Jane!');
+
+// smsNotification.send(); // Output: Sending SMS to Jane Doe: Hello Jane!
+
+// Abstraction:Abstraction hides complex implementation details and exposes only the necessary parts of an object.in javascript,abstraction can be achieved by defining clear interfaces(e.g., methods) while keeping internal logic private.
+
+// Example 1: Abstraction with Classes
+// class CoffeeMachine {
+//     #waterLevel =0;
+//     addWater(amount){
+//         this.#waterLevel = this.#waterLevel + amount;
+//         console.log(`Added ${amount}ml of water. Current water level: ${this.#waterLevel}ml`);
+//     }
+//     makeCoffee() {
+//         if(this.#waterLevel >=100){
+//             this.#waterLevel = this.#waterLevel - 100;
+//             console.log('Making coffee...');
+//         }else{
+//             console.log('Not enough water to make coffee.');
+//         }
+//     }
+// }
+
+// const machine = new CoffeeMachine();
+// machine.addWater(50); // Output: Added 200ml of water. Current water level: 200ml
+// machine.makeCoffee(); // Output: Making coffee...
+// machine.addWater(100); // Output: Making coffee..
+// machine.makeCoffee(); // Output: Not enough water to make coffee.
+
+// Static methods in Javascript:
+// Static methods are called on the class itself, not on instances of the class. They are often used for utility functions or factory methods that don't require access to instance properties.
+
+class CoffeeMachine {
+    #waterLevel =0;
+
+    static startMachine() {
+        console.log('Coffee machine started');
+    }
+
+    addWater(amount){
+        this.#waterLevel = this.#waterLevel + amount;
+        console.log(`Added ${amount}ml of water. Current water level: ${this.#waterLevel}ml`);
+    }
+    makeCoffee() {
+        if(this.#waterLevel >=100){
+            this.#waterLevel = this.#waterLevel - 100;
+            console.log('Making coffee...');
+        }else{
+            console.log('Not enough water to make coffee.');
+        }
+    }
+}
+
+CoffeeMachine.startMachine(); // Output: Coffee machine started
+
+const machine = new CoffeeMachine();
+machine.addWater(50); // Output: Added 200ml of water. Current water level: 200ml
+machine.makeCoffee(); // Output: Making coffee...
+machine.addWater(100); // Output: Making coffee..
+machine.makeCoffee(); // Output: Not enough water to make coffee.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
