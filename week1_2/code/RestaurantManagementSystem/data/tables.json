@@ -1,0 +1,59 @@
+{
+  "tables": [
+    {
+      "id": 1,
+      "capacity": 2,
+      "status": "occupied",
+      "currentOrder": 3
+    },
+    {
+      "id": 2,
+      "capacity": 2,
+      "status": "available"
+    },
+    {
+      "id": 3,
+      "capacity": 4,
+      "status": "available"
+    },
+    {
+      "id": 4,
+      "capacity": 4,
+      "status": "reserved",
+      "reservationId": 2
+    },
+    {
+      "id": 5,
+      "capacity": 6,
+      "status": "occupied",
+      "currentOrder": 2
+    },
+    {
+      "id": 6,
+      "capacity": 6,
+      "status": "available"
+    },
+    {
+      "id": 7,
+      "capacity": 8,
+      "status": "occupied",
+      "currentOrder": 4
+    },
+    {
+      "id": 8,
+      "capacity": 8,
+      "status": "available"
+    },
+    {
+      "id": 9,
+      "capacity": 4,
+      "status": "cleaning"
+    },
+    {
+      "id": 10,
+      "capacity": 2,
+      "status": "reserved",
+      "reservationId": 3
+    }
+  ]
+}

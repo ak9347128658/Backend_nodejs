@@ -1,0 +1,159 @@
+[
+  {
+    "id": 1,
+    "tableId": 3,
+    "customerName": "John Smith",
+    "items": [
+      {
+        "id": 102,
+        "name": "Bruschetta",
+        "price": 7.99,
+        "quantity": 1
+      },
+      {
+        "id": 201,
+        "name": "Spaghetti Bolognese",
+        "price": 14.99,
+        "quantity": 2
+      },
+      {
+        "id": 401,
+        "name": "Soda",
+        "price": 2.99,
+        "quantity": 2
+      }
+    ],
+    "totalAmount": 43.95,
+    "status": "completed",
+    "timestamp": "2025-07-03T10:30:00.000Z",
+    "lastUpdated": "2025-07-03T11:15:00.000Z"
+  },
+  {
+    "id": 2,
+    "tableId": 5,
+    "customerName": "Sarah Johnson",
+    "items": [
+      {
+        "id": 104,
+        "name": "Caesar Salad",
+        "price": 9.99,
+        "quantity": 1
+      },
+      {
+        "id": 202,
+        "name": "Grilled Salmon",
+        "price": 18.99,
+        "quantity": 1
+      },
+      {
+        "id": 402,
+        "name": "Fresh Juice",
+        "price": 4.99,
+        "quantity": 1
+      },
+      {
+        "id": 301,
+        "name": "Tiramisu",
+        "price": 6.99,
+        "quantity": 1
+      }
+    ],
+    "totalAmount": 40.96,
+    "status": "preparing",
+    "timestamp": "2025-07-03T12:15:00.000Z",
+    "lastUpdated": "2025-07-03T12:30:00.000Z"
+  },
+  {
+    "id": 3,
+    "tableId": 1,
+    "customerName": "Mike Wilson",
+    "items": [
+      {
+        "id": 105,
+        "name": "Buffalo Wings",
+        "price": 11.99,
+        "quantity": 1
+      },
+      {
+        "id": 204,
+        "name": "Ribeye Steak",
+        "price": 24.99,
+        "quantity": 1
+      },
+      {
+        "id": 406,
+        "name": "Beer",
+        "price": 4.99,
+        "quantity": 2
+      }
+    ],
+    "totalAmount": 46.96,
+    "status": "pending",
+    "timestamp": "2025-07-03T13:45:00.000Z",
+    "lastUpdated": "2025-07-03T13:45:00.000Z"
+  },
+  {
+    "id": 4,
+    "tableId": 7,
+    "customerName": "Emily Davis",
+    "items": [
+      {
+        "id": 103,
+        "name": "Mozzarella Sticks",
+        "price": 8.99,
+        "quantity": 1
+      },
+      {
+        "id": 205,
+        "name": "Vegetarian Pasta",
+        "price": 13.99,
+        "quantity": 2
+      },
+      {
+        "id": 403,
+        "name": "Coffee",
+        "price": 3.49,
+        "quantity": 2
+      },
+      {
+        "id": 303,
+        "name": "Cheesecake",
+        "price": 6.49,
+        "quantity": 1
+      }
+    ],
+    "totalAmount": 46.45,
+    "status": "serving",
+    "timestamp": "2025-07-03T14:20:00.000Z",
+    "lastUpdated": "2025-07-03T14:35:00.000Z"
+  },
+  {
+    "id": 5,
+    "tableId": 2,
+    "customerName": "Robert Brown",
+    "items": [
+      {
+        "id": 101,
+        "name": "Garlic Bread",
+        "price": 5.99,
+        "quantity": 1
+      },
+      {
+        "id": 206,
+        "name": "Fish and Chips",
+        "price": 15.99,
+        "quantity": 1
+      },
+      {
+        "id": 405,
+        "name": "Wine",
+        "price": 7.99,
+        "quantity": 1
+      }
+    ],
+    "totalAmount": 29.97,
+    "status": "completed",
+    "timestamp": "2025-07-03T11:00:00.000Z",
+    "lastUpdated": "2025-07-03T11:45:00.000Z"
+  }
+]
