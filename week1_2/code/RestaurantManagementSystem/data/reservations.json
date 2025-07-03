@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "customerName": "Alice Cooper",
+    "email": "alice.cooper@email.com",
+    "phone": "+1-555-0123",
+    "partySize": 4,
+    "date": "2025-07-03T19:00:00.000Z",
+    "tableId": null,
+    "status": "confirmed",
+    "specialRequests": "Window seat preferred",
+    "createdAt": "2025-07-02T14:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "customerName": "David Miller",
+    "email": "david.miller@email.com",
+    "phone": "+1-555-0456",
+    "partySize": 2,
+    "date": "2025-07-03T18:30:00.000Z",
+    "tableId": 4,
+    "status": "confirmed",
+    "specialRequests": "Anniversary dinner",
+    "createdAt": "2025-07-01T16:45:00.000Z"
+  },
+  {
+    "id": 3,
+    "customerName": "Lisa Anderson",
+    "email": "lisa.anderson@email.com",
+    "phone": "+1-555-0789",
+    "partySize": 2,
+    "date": "2025-07-03T20:00:00.000Z",
+    "tableId": 10,
+    "status": "confirmed",
+    "specialRequests": "Vegetarian options needed",
+    "createdAt": "2025-07-03T09:15:00.000Z"
+  },
+  {
+    "id": 4,
+    "customerName": "James Wilson",
+    "email": "james.wilson@email.com",
+    "phone": "+1-555-0234",
+    "partySize": 6,
+    "date": "2025-07-04T17:30:00.000Z",
+    "tableId": null,
+    "status": "pending",
+    "specialRequests": "Business dinner, quiet area preferred",
+    "createdAt": "2025-07-03T11:20:00.000Z"
+  },
+  {
+    "id": 5,
+    "customerName": "Maria Garcia",
+    "email": "maria.garcia@email.com",
+    "phone": "+1-555-0567",
+    "partySize": 8,
+    "date": "2025-07-04T19:00:00.000Z",
+    "tableId": null,
+    "status": "confirmed",
+    "specialRequests": "Birthday celebration, cake needed",
+    "createdAt": "2025-07-02T20:10:00.000Z"
+  },
+  {
+    "id": 6,
+    "customerName": "Tom Johnson",
+    "email": "tom.johnson@email.com",
+    "phone": "+1-555-0890",
+    "partySize": 3,
+    "date": "2025-07-05T18:00:00.000Z",
+    "tableId": null,
+    "status": "pending",
+    "specialRequests": "High chair needed for toddler",
+    "createdAt": "2025-07-03T13:30:00.000Z"
+  },
+  {
+    "id": 7,
+    "customerName": "Jennifer Lee",
+    "email": "jennifer.lee@email.com",
+    "phone": "+1-555-0345",
+    "partySize": 4,
+    "date": "2025-07-05T20:30:00.000Z",
+    "tableId": null,
+    "status": "cancelled",
+    "specialRequests": "Allergy to shellfish",
+    "createdAt": "2025-07-02T08:45:00.000Z",
+    "updatedAt": "2025-07-03T10:20:00.000Z"
+  }
+]

@@ -1,0 +1,160 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Appetizers",
+      "items": [
+        {
+          "id": 101,
+          "name": "Garlic Bread",
+          "price": 5.99,
+          "description": "Toasted bread with garlic butter and herbs"
+        },
+        {
+          "id": 102,
+          "name": "Bruschetta",
+          "price": 7.99,
+          "description": "Toasted bread topped with tomatoes, garlic, and basil"
+        },
+        {
+          "id": 103,
+          "name": "Mozzarella Sticks",
+          "price": 8.99,
+          "description": "Golden fried mozzarella with marinara sauce"
+        },
+        {
+          "id": 104,
+          "name": "Caesar Salad",
+          "price": 9.99,
+          "description": "Fresh romaine lettuce with Caesar dressing and croutons"
+        },
+        {
+          "id": 105,
+          "name": "Buffalo Wings",
+          "price": 11.99,
+          "description": "Spicy chicken wings served with ranch dip"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Main Courses",
+      "items": [
+        {
+          "id": 201,
+          "name": "Spaghetti Bolognese",
+          "price": 14.99,
+          "description": "Traditional pasta with rich meat sauce"
+        },
+        {
+          "id": 202,
+          "name": "Grilled Salmon",
+          "price": 18.99,
+          "description": "Fresh salmon fillet with lemon herb sauce"
+        },
+        {
+          "id": 203,
+          "name": "Chicken Parmesan",
+          "price": 16.99,
+          "description": "Breaded chicken breast with marinara and mozzarella"
+        },
+        {
+          "id": 204,
+          "name": "Ribeye Steak",
+          "price": 24.99,
+          "description": "12oz ribeye steak grilled to perfection"
+        },
+        {
+          "id": 205,
+          "name": "Vegetarian Pasta",
+          "price": 13.99,
+          "description": "Penne pasta with seasonal vegetables and olive oil"
+        },
+        {
+          "id": 206,
+          "name": "Fish and Chips",
+          "price": 15.99,
+          "description": "Beer-battered cod with crispy fries"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Desserts",
+      "items": [
+        {
+          "id": 301,
+          "name": "Tiramisu",
+          "price": 6.99,
+          "description": "Classic Italian coffee-flavored dessert"
+        },
+        {
+          "id": 302,
+          "name": "Chocolate Cake",
+          "price": 5.99,
+          "description": "Rich chocolate cake with ganache"
+        },
+        {
+          "id": 303,
+          "name": "Cheesecake",
+          "price": 6.49,
+          "description": "New York style cheesecake with berry compote"
+        },
+        {
+          "id": 304,
+          "name": "Ice Cream Sundae",
+          "price": 4.99,
+          "description": "Vanilla ice cream with chocolate sauce and whipped cream"
+        },
+        {
+          "id": 305,
+          "name": "Apple Pie",
+          "price": 5.49,
+          "description": "Homemade apple pie with vanilla ice cream"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Beverages",
+      "items": [
+        {
+          "id": 401,
+          "name": "Soda",
+          "price": 2.99,
+          "description": "Coca-Cola, Pepsi, Sprite, or Orange Fanta"
+        },
+        {
+          "id": 402,
+          "name": "Fresh Juice",
+          "price": 4.99,
+          "description": "Orange, apple, pineapple, or cranberry"
+        },
+        {
+          "id": 403,
+          "name": "Coffee",
+          "price": 3.49,
+          "description": "Freshly brewed coffee or espresso"
+        },
+        {
+          "id": 404,
+          "name": "Tea",
+          "price": 2.99,
+          "description": "Green tea, black tea, or herbal tea"
+        },
+        {
+          "id": 405,
+          "name": "Wine",
+          "price": 7.99,
+          "description": "Red or white wine by the glass"
+        },
+        {
+          "id": 406,
+          "name": "Beer",
+          "price": 4.99,
+          "description": "Local craft beer or imported bottles"
+        }
+      ]
+    }
+  ]
+}
