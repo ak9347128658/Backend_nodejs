@@ -45,6 +45,30 @@ Create a **Library Management System** as a console application. This project wi
   - Member: `id: string`, `email: string`, `dateJoined: string`
   - Loan: `id: string`, `bookId: string`, `memberId: string`, `loanDate: string`, `returnDate: string | null`
 
+#### Complete Model Schemas
+
+**Book**
+- id: string (UUID)
+- title: string (required)
+- author: string (required)
+- ISBN: string (required, 10 or 13 digits)
+- publicationYear: number (YYYY)
+- available: boolean (true if book is available)
+
+**Member**
+- id: string (UUID)
+- name: string (required)
+- email: string (required, valid email format)
+- phone: string (optional, phone number)
+- membershipDate: string (ISO date)
+
+**Loan**
+- id: string (UUID)
+- bookId: string (UUID, references Book.id)
+- memberId: string (UUID, references Member.id)
+- loanDate: string (ISO date)
+- returnDate: string (ISO date or null)
+
 ### 3. Project Structure (Hints)
 ```
 project-root/
@@ -56,16 +80,12 @@ project-root/
   │     ├── books.json
   │     ├── members.json
   │     └── loans.json
-  ├── controllers/
-  ├── services/
-  ├── utils/
   └── app.js
 ```
 **Detail:**
-- `models/`: constructor functions or classes matching schema.
+- `models/`: constructor functions or classes matching schema and implementing CRUD operations.
 - `data/`: store arrays of objects; pre-seed with sample entries.
-- `controllers/`: implement CRUD; throw or return errors on invalid operations.
-- `utils/`: file I/O, input parsing, and logger modules.
+- `app.js`: the main application file that ties all components together.
 
 ### 4. Implement Core Functionality (Hints)
 1. **Data Access**
