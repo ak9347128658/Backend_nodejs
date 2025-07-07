@@ -17,10 +17,10 @@
           "description": "Toasted bread topped with tomatoes, garlic, and basil"
         },
         {
-          "id": 103,
           "name": "Mozzarella Sticks",
-          "price": 8.99,
-          "description": "Golden fried mozzarella with marinara sauce"
+          "price": 7.99,
+          "description": "Golden fried mozzarella with marinara sauce",
+          "id": 103
         },
         {
           "id": 104,
@@ -33,12 +33,6 @@
           "name": "Buffalo Wings",
           "price": 11.99,
           "description": "Spicy chicken wings served with ranch dip"
-        },
-        {
-          "name": "test_item",
-          "price": 30,
-          "description": "test_description ..",
-          "id": 106
         }
       ]
     },
@@ -95,10 +89,10 @@
           "description": "Classic Italian coffee-flavored dessert"
         },
         {
-          "id": 302,
           "name": "Chocolate Cake",
-          "price": 5.99,
-          "description": "Rich chocolate cake with ganache"
+          "price": 6.22,
+          "description": "Rich chocolate cake with ganache",
+          "id": 302
         },
         {
           "id": 303,
@@ -153,12 +147,6 @@
           "name": "Wine",
           "price": 7.99,
           "description": "Red or white wine by the glass"
-        },
-        {
-          "id": 406,
-          "name": "Beer",
-          "price": 4.99,
-          "description": "Local craft beer or imported bottles"
         }
       ]
     }

@@ -108,6 +108,213 @@ const menuService = {
 }
 
 
+const orderService = {
+    getAllOrders: function() {
+        try {
+            const data = fs.readFileSync(ORDERS_FILE, 'utf8');
+            return JSON.parse(data);
+        } catch (err) {
+            console.error('Error reading orders:', err);
+            return [];
+        }
+    },
+    getOrderById: function(orderId) {
+        try {
+            const data = fs.readFileSync(ORDERS_FILE, 'utf8');
+            const orders = JSON.parse(data);
+            return orders.find(order => order.id === orderId) || null;
+        } catch (err) {
+            console.error('Error finding order:', err);
+            return null;
+        }
+    },
+    createOrder: function(order){
+        try {
+            const data = fs.readFileSync(ORDERS_FILE, 'utf8');
+            const orders = JSON.parse(data);
+            
+            // Generate a new ID
+            const maxId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) : 0;
+            order.id = maxId + 1;
+            order.timestamp = new Date().toISOString();
+            order.lastUpdated = new Date().toISOString();
+            order.status = "pending";
+            
+            orders.push(order);
+            fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+            return order;
+        } catch (err) {
+            console.error('Error creating order:', err);
+            return null;
+        }
+    },
+    updateOrderStatus:function(orderId,status){
+        try {
+            const data = fs.readFileSync(ORDERS_FILE, 'utf8');
+            const orders = JSON.parse(data);
+            
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return false;
+            
+            order.status = status;
+            order.lastUpdated = new Date().toISOString();
+            
+            fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+            return true;
+        } catch (err) {
+            console.error('Error updating order status:', err);
+            return false;
+        }
+    },
+    deleteOrder: function(orderId){
+        try {
+            const data = fs.readFileSync(ORDERS_FILE, 'utf8');
+            const orders = JSON.parse(data);
+            
+            const index = orders.findIndex(o => o.id === orderId);
+            if (index === -1) return false;
+            
+            orders.splice(index, 1);
+            fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+            return true;
+        } catch (err) {
+            console.error('Error deleting order:', err);
+            return false;
+        }
+    }
+};
+
+const tableService = {
+    getAllTables: function() {
+        try {
+            const data = fs.readFileSync(TABLES_FILE, 'utf8');
+            const tableData = JSON.parse(data);
+            return tableData.tables;
+        } catch (err) {
+            console.error('Error reading tables:', err);
+            return [];
+        }
+    },
+    getAvailableTables: function(partySize){
+        try {
+            const data = fs.readFileSync(TABLES_FILE, 'utf8');
+            const tableData = JSON.parse(data);
+            
+            return tableData.tables.filter(table => 
+                table.status === "available" && table.capacity >= partySize
+            );
+        } catch (err) {
+            console.error('Error finding available tables:', err);
+            return [];
+        }
+    },
+    updateTableStatus: function(tableId,status){
+        try {
+            const data = fs.readFileSync(TABLES_FILE, 'utf8');
+            const tableData = JSON.parse(data);
+            
+            const table = tableData.tables.find(t => t.id === tableId);
+            if (!table) return false;
+            
+            table.status = status;
+            fs.writeFileSync(TABLES_FILE, JSON.stringify(tableData, null, 2), 'utf8');
+            return true;
+        } catch (err) {
+            console.error('Error updating table status:', err);
+            return false;
+        }
+    }
+}
+
+// Data access functions for reservations
+const reservationService = {
+    getAllReservations: function() {
+        try {
+            const data = fs.readFileSync(RESERVATIONS_FILE, 'utf8');
+            return JSON.parse(data);
+        } catch (err) {
+            console.error('Error reading reservations:', err);
+            return [];
+        }
+    },
+
+    getReservationsByDate: function(date) {
+        try {
+            const data = fs.readFileSync(RESERVATIONS_FILE, 'utf8');
+            const reservations = JSON.parse(data);
+            
+            return reservations.filter(res => 
+                res.date.split('T')[0] === date.split('T')[0]
+            );
+        } catch (err) {
+            console.error('Error finding reservations by date:', err);
+            return [];
+        }
+    },
+
+    createReservation: function(reservation) {
+        try {
+            const data = fs.readFileSync(RESERVATIONS_FILE, 'utf8');
+            const reservations = JSON.parse(data);
+            
+            // Generate a new ID
+            const maxId = reservations.length > 0 ? Math.max(...reservations.map(r => r.id)) : 0;
+            reservation.id = maxId + 1;
+            reservation.createdAt = new Date().toISOString();
+            
+            reservations.push(reservation);
+            fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify(reservations, null, 2), 'utf8');
+            return reservation;
+        } catch (err) {
+            console.error('Error creating reservation:', err);
+            return null;
+        }
+    },
+
+    updateReservation: function(reservationId, updatedReservation) {
+        try {
+            const data = fs.readFileSync(RESERVATIONS_FILE, 'utf8');
+            const reservations = JSON.parse(data);
+            
+            const index = reservations.findIndex(r => r.id === reservationId);
+            if (index === -1) return false;
+            
+            // Preserve the ID and creation date
+            updatedReservation.id = reservationId;
+            updatedReservation.createdAt = reservations[index].createdAt;
+            updatedReservation.updatedAt = new Date().toISOString();
+            
+            reservations[index] = updatedReservation;
+            fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify(reservations, null, 2), 'utf8');
+            return true;
+        } catch (err) {
+            console.error('Error updating reservation:', err);
+            return false;
+        }
+    },
+
+    deleteReservation: function(reservationId) {
+        try {
+            const data = fs.readFileSync(RESERVATIONS_FILE, 'utf8');
+            const reservations = JSON.parse(data);
+            
+            const index = reservations.findIndex(r => r.id === reservationId);
+            if (index === -1) return false;
+            
+            reservations.splice(index, 1);
+            fs.writeFileSync(RESERVATIONS_FILE, JSON.stringify(reservations, null, 2), 'utf8');
+            return true;
+        } catch (err) {
+            console.error('Error deleting reservation:', err);
+            return false;
+        }
+    }
+};
+
+
 module.exports = {
-    menuService
+    menuService,
+    orderService,
+    tableService,
+    reservationService
 }
