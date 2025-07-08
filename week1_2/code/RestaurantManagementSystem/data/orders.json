@@ -79,12 +79,6 @@
         "name": "Ribeye Steak",
         "price": 24.99,
         "quantity": 1
-      },
-      {
-        "id": 406,
-        "name": "Beer",
-        "price": 4.99,
-        "quantity": 2
       }
     ],
     "totalAmount": 46.96,

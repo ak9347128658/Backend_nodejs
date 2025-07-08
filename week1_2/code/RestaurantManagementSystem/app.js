@@ -311,7 +311,7 @@ function viewAllOrders() {
             
             let total = 0;
             order.items.forEach(item => {
-                const menuItem = menuService.getMenuItemById(item.menuItemId);
+                const menuItem = menuService.getMenuItemById(item.id);
                 const itemTotal = menuItem.price * item.quantity;
                 total += itemTotal;
                 console.log(`- ${item.quantity}x ${menuItem.name} ($${menuItem.price.toFixed(2)}) = $${itemTotal.toFixed(2)}`);
