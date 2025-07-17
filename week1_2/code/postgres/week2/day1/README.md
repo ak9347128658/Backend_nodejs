@@ -2,30 +2,30 @@
 
 # Day 1: Grouping and Aggregations in PostgreSQL
 
-Welcome to Day 1 of Week 2 in our PostgreSQL learning journey! Today, we dive into **Grouping and Aggregations**, essential techniques for summarizing and analyzing data in a database. This document is designed to be beginner-friendly, with clear explanations, practical examples, and exercises to help you master these concepts. By the end, you'll be able to use aggregate functions, group data, filter grouped results, and combine these techniques with joins for powerful data analysis.
+Welcome to Day 1 of Week 2 in our PostgreSQL learning journey! Today, we'll explore **Grouping and Aggregations**, which help you summarize and analyze data in a database. This guide is designed for beginners, with simple explanations, hands-on examples, and visual diagrams to make learning fun and clear. By the end, you'll know how to summarize data, group it, filter results, and combine these skills with table joins for awesome data insights!
 
-## Topics Covered
+## What You'll Learn
 
-1. **Aggregate Functions (COUNT, SUM, AVG, MIN, MAX)**: Learn how to summarize data using built-in functions.
-2. **GROUP BY Clause**: Group rows with the same values into summary rows.
+1. **Aggregate Functions (COUNT, SUM, AVG, MIN, MAX)**: Summarize data with built-in tools.
+2. **GROUP BY Clause**: Organize data into groups for summarizing.
 3. **HAVING Clause**: Filter grouped data based on conditions.
-4. **Filtering Before and After Grouping (WHERE vs. HAVING)**: Understand the order of operations in SQL queries.
-5. **Grouping Sets**: Advanced grouping for multiple levels of aggregation in a single query.
-6. **Aggregate Functions with JOINs**: Combine aggregations with table joins for richer insights.
+4. **WHERE vs. HAVING**: Learn when to filter before or after grouping.
+5. **Grouping Sets**: Create multiple summary levels in one query.
+6. **Aggregations with JOINs**: Combine data from multiple tables for deeper analysis.
 
-## Understanding the Sample Database
+## Our Sample Database
 
-To make learning hands-on, we'll use a sample database with three tables: `sales`, `products`, and `date_dim`. Here's a quick overview:
+We'll use a simple database with three tables: `sales`, `products`, and `date_dim`. Here's what they contain:
 
-- **sales**: Stores sales transactions with columns for `sale_id`, `product_id`, `customer_id`, `sale_date`, `quantity`, `unit_price`, and `total_price`.
-- **products**: Contains product details like `product_id`, `product_name`, `category`, and `supplier`.
-- **date_dim**: A date dimension table for time-based analysis, with columns like `date_id`, `day_of_week`, `month`, `quarter`, and `year`.
+- **sales**: Tracks sales with columns like `sale_id`, `product_id`, `customer_id`, `sale_date`, `quantity`, `unit_price`, and `total_price`.
+- **products**: Lists products with `product_id`, `product_name`, `category`, and `supplier`.
+- **date_dim**: Helps with date analysis, with columns like `date_id`, `day_of_week`, `month`, `quarter`, and `year`.
 
-We'll create these tables and insert sample data to demonstrate each concept.
+Let's set these up so you can follow along!
 
 ### Setting Up the Sample Database
 
-Let's start by creating and populating the tables. Run the following SQL to set up the environment:
+Run this SQL code to create and fill the tables:
 
 ```sql
 -- Create sales table
@@ -94,17 +94,81 @@ VALUES
     ('2023-01-24', 'Tuesday', 'January', 'Q1', 2023);
 ```
 
+## Visual Explanations
+
+These text-based diagrams show the big picture of how SQL processes grouping and aggregations.
+
+### Diagram 1: How GROUP BY Works
+This shows how `GROUP BY` organizes rows into groups before summarizing them.
+
+```
+Rows in Table
+  |
+  v
+[Group by Column]
+  |--> Group 1 (e.g., product_id = 1) --> Aggregate (e.g., COUNT, SUM)
+  |--> Group 2 (e.g., product_id = 2) --> Aggregate
+  |--> Group 3 (e.g., product_id = 3) --> Aggregate
+  |
+  v
+Summarized Results
+```
+
+### Diagram 2: WHERE vs. HAVING
+This explains filtering before (`WHERE`) and after (`HAVING`) grouping.
+
+```
+Raw Data
+  |
+  v
+[WHERE: Filter Rows]
+  |--> Keep rows where condition is true
+  |
+  v
+[GROUP BY: Group Rows]
+  |--> Create groups
+  |
+  v
+[Aggregate: COUNT, SUM, etc.]
+  |
+  v
+[HAVING: Filter Groups]
+  |--> Keep groups where condition is true
+  |
+  v
+Final Results
+```
+
+### Diagram 3: SQL Query Execution Order
+This shows the order SQL processes a query.
+
+```
+1. FROM (Get data from tables)
+  |
+2. JOIN (Combine tables)
+  |
+3. WHERE (Filter individual rows)
+  |
+4. GROUP BY (Group rows)
+  |
+5. HAVING (Filter groups)
+  |
+6. SELECT (Choose columns and aggregates)
+  |
+7. ORDER BY (Sort results)
+  |
+Final Output
+```
+
 ## Topic 1: Aggregate Functions (COUNT, SUM, AVG, MIN, MAX)
 
-**Explanation**: Aggregate functions perform calculations on a set of values and return a single result. They are used to summarize data, such as counting rows, summing values, or finding averages. Common aggregate functions in PostgreSQL include:
+**What They Do**: Aggregate functions take many values and return one result, like counting rows or finding an average.
 
-- **COUNT**: Counts the number of rows or non-null values.
-- **SUM**: Adds up numeric values.
-- **AVG**: Calculates the average of numeric values.
+- **COUNT**: Counts rows or non-null values.
+- **SUM**: Adds up numbers.
+- **AVG**: Finds the average.
 - **MIN**: Finds the smallest value.
 - **MAX**: Finds the largest value.
-
-These functions are often used with the entire table or with grouped data (covered later).
 
 ### Examples
 
@@ -113,45 +177,71 @@ These functions are often used with the entire table or with grouped data (cover
    SELECT COUNT(*) AS total_sales
    FROM sales;
    ```
-   *Explanation*: Counts all rows in the `sales` table to determine the total number of sales transactions.
+   *What it does*: Counts all rows in the `sales` table.
+   
+   **Diagram: How COUNT Works**
+   ```
+   sales Table
+   | sale_id | product_id | ... |
+   |---------|------------|-----|
+   |    1    |     1      | ... |
+   |    2    |     2      | ... |
+   |   ...   |    ...     | ... |
+        |
+        v
+   COUNT(*) --> 10 rows (total_sales = 10)
+   ```
 
-2. **Total Revenue Across All Sales**
+2. **Total Revenue**
    ```sql
    SELECT SUM(total_price) AS total_revenue
    FROM sales;
    ```
-   *Explanation*: Sums the `total_price` column to calculate the total revenue from all sales.
+   *What it does*: Adds up all `total_price` values.
+
+   **Diagram: How SUM Works**
+   ```
+   sales Table
+   | total_price |
+   |-------------|
+   |   51.98     |
+   |   149.99    |
+   |   ...       |
+        |
+        v
+   SUM(total_price) --> Add all values --> total_revenue
+   ```
 
 3. **Average Sale Amount**
    ```sql
    SELECT AVG(total_price) AS average_sale
    FROM sales;
    ```
-   *Explanation*: Computes the average sale amount by dividing the sum of `total_price` by the number of sales.
+   *What it does*: Calculates the average of `total_price`.
 
-4. **Minimum and Maximum Sale Amounts**
+4. **Smallest and Largest Sales**
    ```sql
    SELECT 
        MIN(total_price) AS min_sale,
        MAX(total_price) AS max_sale
    FROM sales;
    ```
-   *Explanation*: Finds the smallest and largest values in the `total_price` column.
+   *What it does*: Finds the smallest and largest `total_price`.
 
-5. **Count of Unique Customers**
+5. **Unique Customers**
    ```sql
    SELECT COUNT(DISTINCT customer_id) AS unique_customers
    FROM sales;
    ```
-   *Explanation*: Uses `DISTINCT` with `COUNT` to count only unique `customer_id` values, showing how many different customers made purchases.
+   *What it does*: Counts unique `customer_id` values.
 
 ## Topic 2: GROUP BY Clause
 
-**Explanation**: The `GROUP BY` clause groups rows that have the same values in specified columns into summary rows. It is used with aggregate functions to produce summarized results for each group. For example, you can group sales by `product_id` to see total sales per product.
+**What It Does**: `GROUP BY` organizes rows with the same value in a column into groups, then summarizes each group.
 
 ### Examples
 
-1. **Sales Count and Revenue by Product**
+1. **Sales and Revenue by Product**
    ```sql
    SELECT 
        product_id,
@@ -161,9 +251,32 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY product_id
    ORDER BY total_revenue DESC;
    ```
-   *Explanation*: Groups sales by `product_id` and calculates the number of sales and total revenue for each product.
+   *What it does*: Groups sales by `product_id` and shows count and revenue per product.
 
-2. **Daily Sales Summary**
+   **Diagram: How GROUP BY Works for This Query**
+   ```
+   sales Table
+   | product_id | total_price |
+   |------------|-------------|
+   |     1      |   51.98     |
+   |     1      |   25.99     |
+   |     2      |   149.99    |
+   |     ...    |   ...       |
+        |
+        v
+   GROUP BY product_id
+   |--> Group: product_id=1 | COUNT=3, SUM=155.94
+   |--> Group: product_id=2 | COUNT=2, SUM=299.98
+   |--> ...
+        |
+        v
+   Result: | product_id | sale_count | total_revenue |
+           |------------|------------|---------------|
+           |     1      |     3      |    155.94     |
+           |     2      |     2      |    299.98     |
+   ```
+
+2. **Daily Sales**
    ```sql
    SELECT 
        sale_date,
@@ -173,7 +286,7 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY sale_date
    ORDER BY sale_date;
    ```
-   *Explanation*: Groups sales by `sale_date` to show the number of transactions and revenue for each day.
+   *What it does*: Groups sales by date to show transactions and revenue per day.
 
 3. **Units Sold by Product**
    ```sql
@@ -184,9 +297,9 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY product_id
    ORDER BY total_units_sold DESC;
    ```
-   *Explanation*: Sums the `quantity` column for each `product_id` to show how many units of each product were sold.
+   *What it does*: Shows total units sold per product.
 
-4. **Average Sale Amount by Customer**
+4. **Average Sale by Customer**
    ```sql
    SELECT 
        customer_id,
@@ -195,7 +308,7 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY customer_id
    ORDER BY avg_sale_amount DESC;
    ```
-   *Explanation*: Groups by `customer_id` and calculates the average sale amount per customer.
+   *What it does*: Finds the average sale amount per customer.
 
 5. **Sales by Weekday**
    ```sql
@@ -207,11 +320,11 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY dd.day_of_week
    ORDER BY sale_count DESC;
    ```
-   *Explanation*: Joins `sales` with `date_dim` to group sales by the day of the week, counting transactions per day.
+   *What it does*: Groups sales by day of the week.
 
 ## Topic 3: HAVING Clause
 
-**Explanation**: The `HAVING` clause filters grouped data based on conditions applied to aggregate functions. It is used after `GROUP BY` to filter groups, unlike `WHERE`, which filters individual rows before grouping.
+**What It Does**: `HAVING` filters groups after `GROUP BY` based on aggregate conditions.
 
 ### Examples
 
@@ -225,7 +338,33 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING COUNT(*) > 1
    ORDER BY sale_count DESC;
    ```
-   *Explanation*: Finds products that have been sold more than once by filtering groups with a sale count greater than 1.
+   *What it does*: Shows products with more than one sale.
+
+   **Diagram: How HAVING Works**
+   ```
+   sales Table
+        |
+        v
+   GROUP BY product_id
+   |--> Group: product_id=1 | COUNT=3
+   |--> Group: product_id=2 | COUNT=2
+   |--> Group: product_id=3 | COUNT=2
+   |--> Group: product_id=4 | COUNT=2
+   |--> Group: product_id=5 | COUNT=1
+        |
+        v
+   HAVING COUNT(*) > 1
+   |--> Keep: product_id=1,2,3,4
+   |--> Discard: product_id=5
+        |
+        v
+   Result: | product_id | sale_count |
+           |------------|------------|
+           |     1      |     3      |
+           |     2      |     2      |
+           |     3      |     2      |
+           |     4      |     2      |
+   ```
 
 2. **High-Revenue Products**
    ```sql
@@ -237,9 +376,9 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING SUM(total_price) > 100
    ORDER BY total_revenue DESC;
    ```
-   *Explanation*: Identifies products with total revenue exceeding $100.
+   *What it does*: Finds products with over $100 in sales.
 
-3. **Customers with High Average Purchases**
+3. **High-Spending Customers**
    ```sql
    SELECT 
        customer_id,
@@ -249,9 +388,9 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING AVG(total_price) > 50
    ORDER BY avg_purchase DESC;
    ```
-   *Explanation*: Finds customers whose average purchase amount is greater than $50.
+   *What it does*: Shows customers with average purchases over $50.
 
-4. **Days with High Transaction Counts**
+4. **Busy Days**
    ```sql
    SELECT 
        sale_date,
@@ -261,9 +400,9 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING COUNT(*) >= 2
    ORDER BY transaction_count DESC;
    ```
-   *Explanation*: Shows days with two or more sales transactions.
+   *What it does*: Finds days with 2 or more sales.
 
-5. **Categories with High Average Unit Price**
+5. **Expensive Categories**
    ```sql
    SELECT 
        p.category,
@@ -274,15 +413,15 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING AVG(s.unit_price) > 30
    ORDER BY avg_unit_price DESC;
    ```
-   *Explanation*: Finds product categories where the average unit price of sales exceeds $30.
+   *What it does*: Shows categories with average unit prices over $30.
 
-## Topic 4: Filtering Before and After Grouping (WHERE vs. HAVING)
+## Topic 4: WHERE vs. HAVING
 
-**Explanation**: In SQL, filtering can occur before grouping (using `WHERE`) or after grouping (using `HAVING`). `WHERE` filters individual rows before they are grouped, while `HAVING` filters the grouped results based on aggregate conditions. The order of operations in SQL is: `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY`.
+**What It Does**: `WHERE` filters rows before grouping, `HAVING` filters groups after grouping. SQL order: `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY`.
 
 ### Examples
 
-1. **Filter Sales by Date, Then Group by Product**
+1. **Recent Sales by Product**
    ```sql
    SELECT 
        product_id,
@@ -293,9 +432,34 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY product_id
    ORDER BY total_revenue DESC;
    ```
-   *Explanation*: Filters sales after January 20, 2023, then groups by `product_id` to show sales count and revenue.
+   *What it does*: Filters sales after January 20, then groups by product.
 
-2. **Filter by Price, Group, and Filter by Average**
+   **Diagram: WHERE and GROUP BY**
+   ```
+   sales Table
+   | product_id | sale_date  | total_price |
+   |------------|------------|-------------|
+   |     1      | 2023-01-15 |   51.98     |
+   |     1      | 2023-01-23 |   77.97     |
+   |     ...    |  ...       |   ...       |
+        |
+        v
+   WHERE sale_date > '2023-01-20'
+   |--> Keep rows after Jan 20
+        |
+        v
+   GROUP BY product_id
+   |--> Group: product_id=1 | COUNT=1, SUM=77.97
+   |--> ...
+        |
+        v
+   Result: | product_id | sale_count | total_revenue |
+           |------------|------------|---------------|
+           |     1      |     1      |    77.97      |
+           |    ...     |    ...     |    ...        |
+   ```
+
+2. **Filtered Average Prices**
    ```sql
    SELECT 
        product_id,
@@ -306,9 +470,9 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING AVG(unit_price) > 20
    ORDER BY avg_price DESC;
    ```
-   *Explanation*: Filters sales after January 15, groups by `product_id`, and then filters groups where the average unit price exceeds $20.
+   *What it does*: Filters sales after January 15, groups by product, keeps groups with average price over $20.
 
-3. **High-Quantity Sales by Customer**
+3. **High-Quantity Sales**
    ```sql
    SELECT 
        customer_id,
@@ -319,7 +483,7 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING SUM(quantity) > 5
    ORDER BY total_quantity DESC;
    ```
-   *Explanation*: Filters sales with quantity greater than 1, groups by `customer_id`, and keeps groups with total quantity over 5.
+   *What it does*: Filters sales with quantity over 1, groups by customer, keeps customers with total quantity over 5.
 
 4. **Recent Sales by Category**
    ```sql
@@ -333,9 +497,9 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING COUNT(*) > 1
    ORDER BY sale_count DESC;
    ```
-   *Explanation*: Filters sales from January 18 onward, groups by category, and keeps categories with more than one sale.
+   *What it does*: Filters sales from January 18, groups by category, keeps categories with multiple sales.
 
-5. **High-Value Sales by Date**
+5. **High-Value Days**
    ```sql
    SELECT 
        sale_date,
@@ -346,15 +510,15 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING SUM(total_price) > 100
    ORDER BY daily_revenue DESC;
    ```
-   *Explanation*: Filters sales with individual total prices over $50, groups by date, and keeps days with total revenue over $100.
+   *What it does*: Filters sales over $50, groups by date, keeps days with over $100 in revenue.
 
 ## Topic 5: Grouping Sets
 
-**Explanation**: Grouping Sets allow you to perform multiple levels of grouping in a single query, producing a result set that combines different aggregations. This is useful for generating reports with subtotals and grand totals without running multiple queries. In PostgreSQL, you can use `GROUPING SETS`, `ROLLUP`, or `CUBE` for advanced grouping.
+**What It Does**: Grouping Sets summarize data at multiple levels in one query, like totals by product and date, just by product, and overall.
 
 ### Examples
 
-1. **Sales by Product and Date with Grand Total**
+1. **Sales by Product and Date**
    ```sql
    SELECT 
        product_id,
@@ -368,7 +532,27 @@ These functions are often used with the entire table or with grouped data (cover
    )
    ORDER BY product_id, sale_date;
    ```
-   *Explanation*: Groups sales by `product_id` and `sale_date`, by `product_id` alone, and provides a grand total (empty set `()`).
+   *What it does*: Shows revenue by product and date, by product, and a grand total.
+
+   **Diagram: How GROUPING SETS Works**
+   ```
+   sales Table
+        |
+        v
+   GROUP BY GROUPING SETS
+   |--> (product_id, sale_date) | SUM(total_price) per product and date
+   |--> (product_id)            | SUM(total_price) per product
+   |--> ()                     | SUM(total_price) for all rows
+        |
+        v
+   Result: | product_id | sale_date  | total_revenue |
+           |------------|------------|---------------|
+           |     1      | 2023-01-15 |    51.98      |
+           |     1      | 2023-01-18 |    25.99      |
+           |     1      | NULL       |    155.94     |
+           |    ...     | ...        |    ...        |
+           |    NULL    | NULL       |    663.35     |
+   ```
 
 2. **Revenue by Category and Supplier**
    ```sql
@@ -385,9 +569,9 @@ These functions are often used with the entire table or with grouped data (cover
    )
    ORDER BY p.category, p.supplier;
    ```
-   *Explanation*: Shows revenue by category and supplier, by category alone, and a grand total.
+   *What it does*: Shows revenue by category and supplier, by category, and a grand total.
 
-3. **Sales Count by Day and Month**
+3. **Sales by Day and Month**
    ```sql
    SELECT 
        dd.day_of_week,
@@ -402,9 +586,9 @@ These functions are often used with the entire table or with grouped data (cover
    )
    ORDER BY dd.month, dd.day_of_week;
    ```
-   *Explanation*: Counts sales by day of week and month, by month alone, and a grand total.
+   *What it does*: Counts sales by day and month, by month, and a grand total.
 
-4. **Units Sold by Product and Category**
+4. **Units by Product and Category**
    ```sql
    SELECT 
        p.product_id,
@@ -419,7 +603,7 @@ These functions are often used with the entire table or with grouped data (cover
    )
    ORDER BY p.category, p.product_id;
    ```
-   *Explanation*: Summarizes units sold by product and category, by category, and a grand total.
+   *What it does*: Shows units sold by product and category, by category, and a grand total.
 
 5. **Revenue by Quarter and Year**
    ```sql
@@ -436,15 +620,15 @@ These functions are often used with the entire table or with grouped data (cover
    )
    ORDER BY dd.year, dd.quarter;
    ```
-   *Explanation*: Shows revenue by quarter and year, by year, and a grand total.
+   *What it does*: Shows revenue by quarter and year, by year, and a grand total.
 
 ## Topic 6: Aggregate Functions with JOINs
 
-**Explanation**: Combining aggregate functions with `JOIN` operations allows you to summarize data across multiple tables. For example, you can join `sales` with `products` to analyze sales by product name or category.
+**What It Does**: Combine `JOIN` with aggregates to summarize data across tables.
 
 ### Examples
 
-1. **Sales by Product Name and Category**
+1. **Sales by Product and Category**
    ```sql
    SELECT 
        p.product_name,
@@ -456,9 +640,39 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY p.product_name, p.category
    ORDER BY total_revenue DESC;
    ```
-   *Explanation*: Joins `sales` and `products` to summarize sales count and revenue by product name and category.
+   *What it does*: Shows sales count and revenue by product and category.
 
-2. **Average Unit Price by Category**
+   **Diagram: How JOIN and GROUP BY Work**
+   ```
+   sales Table          products Table
+   | product_id | ... |   | product_id | product_name | category |
+   |------------|-----|   |------------|--------------|----------|
+   |     1      | ... |   |     1      | Basic T-shirt| Clothing |
+   |     2      | ... |   |     2      | Headphones   |Electronics|
+        |                    |
+        v                    v
+   JOIN ON product_id
+        |
+        v
+   Combined Table
+   | product_id | product_name | category | total_price |
+   |------------|--------------|----------|-------------|
+   |     1      | Basic T-shirt| Clothing |   51.98     |
+   |     ...    | ...          | ...      |   ...       |
+        |
+        v
+   GROUP BY product_name, category
+   |--> Group: Basic T-shirt, Clothing | COUNT=3, SUM=155.94
+   |--> ...
+        |
+        v
+   Result: | product_name  | category | sale_count | total_revenue |
+           |---------------|----------|------------|---------------|
+           | Basic T-shirt | Clothing |     3      |    155.94     |
+           | ...           | ...      |    ...     |    ...        |
+   ```
+
+2. **Average Price by Category**
    ```sql
    SELECT 
        p.category,
@@ -469,9 +683,9 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY p.category
    ORDER BY avg_unit_price DESC;
    ```
-   *Explanation*: Calculates the average unit price and sale count per product category.
+   *What it does*: Shows average price and sale count per category.
 
-3. **Total Units Sold by Supplier**
+3. **Units by Supplier**
    ```sql
    SELECT 
        p.supplier,
@@ -481,9 +695,9 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY p.supplier
    ORDER BY total_units_sold DESC;
    ```
-   *Explanation*: Summarizes the total units sold for each supplier.
+   *What it does*: Shows total units sold per supplier.
 
-4. **Sales by Category and Day of Week**
+4. **Sales by Category and Day**
    ```sql
    SELECT 
        p.category,
@@ -495,7 +709,7 @@ These functions are often used with the entire table or with grouped data (cover
    GROUP BY p.category, dd.day_of_week
    ORDER BY p.category, total_revenue DESC;
    ```
-   *Explanation*: Combines `sales`, `products`, and `date_dim` to show revenue by category and day of the week.
+   *What it does*: Shows revenue by category and day of the week.
 
 5. **High-Revenue Products by Supplier**
    ```sql
@@ -509,56 +723,57 @@ These functions are often used with the entire table or with grouped data (cover
    HAVING SUM(s.total_price) > 50
    ORDER BY total_revenue DESC;
    ```
-   *Explanation*: Identifies products with total revenue over $50, grouped by supplier and product name.
+   *What it does*: Shows products with over $50 in revenue, grouped by supplier and product.
 
 ## Practice Exercises
 
-To solidify your understanding, try these exercises using the `retail_store` database (assumed to have tables: `products`, `order_items`, `orders`, `customers`, `categories`). If you don't have this database, use the `sales`, `products`, and `date_dim` tables created above, adapting the queries as needed.
+Try these exercises to test your skills! Use the `sales`, `products`, and `date_dim` tables above (or adapt for a `retail_store` database if available).
 
 ### Exercise 1: Basic Aggregations
-1. Calculate the total revenue for each product.
-2. Find the average order value for each customer.
-3. Count how many orders each customer has placed.
-4. Determine which category has the most products.
-5. Find the total revenue by order status.
+1. Find total revenue for each product.
+2. Calculate average order value per customer.
+3. Count orders per customer.
+4. Find the category with the most products.
+5. Calculate total revenue by order status (if applicable).
 
 ### Exercise 2: Using HAVING
-1. Find products ordered more than 2 times.
-2. Identify customers who have spent more than $500 total.
-3. Find categories with an average product price over $50.
-4. Find days with more than 3 sales transactions.
-5. Identify suppliers with total sales revenue over $200.
+1. Find products sold more than 2 times.
+2. Identify customers who spent over $500 total.
+3. Find categories with average product prices over $50.
+4. Find days with more than 3 sales.
+5. Identify suppliers with total sales over $200.
 
 ### Exercise 3: Combining Filtering and Grouping
-1. Find total sales by category for products with inventory count > 20.
-2. Calculate the average order value by month for orders with status 'Delivered'.
-3. Count orders by customer for orders placed in 2023.
+1. Find total sales by category for products with quantity > 20 (if applicable).
+2. Calculate average order value by month for sales after January 15.
+3. Count orders by customer for 2023 sales.
 4. Find total revenue by product for sales after January 15, 2023.
-5. Calculate the average unit price by category for sales with quantity > 2.
+5. Calculate average unit price by category for sales with quantity > 2.
 
 ### Exercise 4: Multiple Grouping Levels
 1. Calculate sales by category and month.
-2. Find the number of products in each price range (0-50, 51-100, 101-200, 200+) by category.
-3. Determine the average order value by customer and order status.
+2. Count products in price ranges (0-50, 51-100, 101-200, 200+) by category.
+3. Find average order value by customer and order status (if applicable).
 4. Summarize sales by supplier and day of week.
 5. Calculate total revenue by product and quarter.
 
 ### Exercise 5: Challenge
-Calculate the percentage of total revenue that each product category represents, including categories with zero sales. Use a CTE or subquery to compute the grand total and category totals.
+Calculate the percentage of total revenue each product category represents, including categories with zero sales. Use a CTE or subquery to find the grand total and category totals.
 
 ## Additional Resources
 
-- [PostgreSQL Aggregate Functions Documentation](https://www.postgresql.org/docs/current/functions-aggregate.html)
-- [PostgreSQL GROUP BY Documentation](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUP)
-- [PostgreSQL HAVING Documentation](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-HAVING)
-- [PostgreSQL GROUPING SETS, ROLLUP, and CUBE](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUPING-SETS)
+- [PostgreSQL Aggregate Functions](https://www.postgresql.org/docs/current/functions-aggregate.html)
+- [PostgreSQL GROUP BY](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUP)
+- [PostgreSQL HAVING](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-HAVING)
+- [PostgreSQL GROUPING SETS](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUPING-SETS)
 
 ## Tips for Learning
 
-- **Practice Regularly**: Run each example and modify the queries to see how results change.
-- **Understand the Data**: Familiarize yourself with the table structures to write meaningful queries.
-- **Break Down Queries**: Start with simple aggregates, then add `GROUP BY`, `HAVING`, and `JOINs` step-by-step.
-- **Use Comments**: Comment your SQL code to clarify your thought process.
-- **Test with Small Data**: Use the provided sample data to verify your queries before applying them to larger datasets.
+- **Practice**: Run each example and tweak the queries to see what happens.
+- **Know Your Data**: Understand the table columns to write better queries.
+- **Start Simple**: Begin with basic aggregates, then add `GROUP BY` and `HAVING`.
+- **Use Comments**: Add notes to your SQL to explain your steps.
+- **Test Small**: Use the sample data to check your queries before trying bigger datasets.
 
-Happy querying, and enjoy exploring the power of grouping and aggregations in PostgreSQL!
+Happy querying, and have fun mastering PostgreSQL grouping and aggregations!
+
