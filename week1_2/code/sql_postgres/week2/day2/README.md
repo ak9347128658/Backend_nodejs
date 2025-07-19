@@ -2,7 +2,7 @@
 
 # Day 2: Subqueries and Common Table Expressions (CTEs) in PostgreSQL
 
-This document is designed to help you understand **Subqueries** and **Common Table Expressions (CTEs)** in PostgreSQL. We'll break down each topic with clear explanations, practical examples, and exercises to solidify your understanding. This guide assumes you have a basic understanding of SQL and PostgreSQL, but we'll keep things simple and approachable for beginners.
+This document introduces **Subqueries** and **Common Table Expressions (CTEs)** in PostgreSQL, designed to help students understand these concepts through clear explanations, practical examples, and visual Mermaid.js diagrams. The guide assumes a basic understanding of SQL and PostgreSQL but is beginner-friendly.
 
 ---
 
@@ -11,7 +11,7 @@ This document is designed to help you understand **Subqueries** and **Common Tab
 1. **Subqueries in WHERE Clause**  
    - Filtering data based on results from another query.
 2. **Subqueries in SELECT Clause**  
-   - Including computed values from subqueries in your result set.
+   - Including computed values from subqueries in the result set.
 3. **Subqueries in FROM Clause**  
    - Treating subquery results as temporary tables.
 4. **Correlated Subqueries**  
@@ -27,7 +27,7 @@ This document is designed to help you understand **Subqueries** and **Common Tab
 
 ## Setup: Sample Database
 
-To follow along with the examples, we'll use two sample tables: `employees` and `departments`. Below is the SQL to create and populate these tables:
+We'll use two sample tables: `employees` and `departments`. Below is the SQL to create and populate these tables:
 
 ```sql
 -- Create employees table
@@ -70,23 +70,23 @@ VALUES
     ('Emily', 'Wilson', 2, 76000, '2020-09-03');
 ```
 
-Run these commands in your PostgreSQL environment to create the tables and insert the data. We'll use this data for all examples.
+Run these commands in your PostgreSQL environment to set up the tables. These tables will be used in all examples.
 
 ---
 
 ## Topic 1: Subqueries in WHERE Clause
 
 ### Explanation
-A **subquery** in the `WHERE` clause is a query nested inside another query, used to filter rows based on the result of the subquery. The subquery runs first, and its result is used to evaluate the condition in the `WHERE` clause of the outer query. Subqueries in `WHERE` clauses are often used with operators like `=`, `>`, `<`, `IN`, or `NOT IN`.
+A subquery in the `WHERE` clause is a nested query that filters rows based on its results. It runs first, and its output is used by the outer query's `WHERE` condition, often with operators like `=`, `>`, `<`, `IN`, or `NOT IN`.
 
 ### Why Use It?
-- To compare a value against an aggregated result (e.g., average, maximum).
-- To filter rows based on data from another table.
-- To check membership in a set of values.
+- Compare values against aggregates (e.g., average salary).
+- Filter based on data from another table.
+- Check membership in a set of values.
 
 ### Examples
 
-1. **Find employees with a salary higher than the company-wide average salary**
+1. **Find employees with a salary higher than the company-wide average**
    ```sql
    SELECT 
        employee_id,
@@ -97,7 +97,13 @@ A **subquery** in the `WHERE` clause is a query nested inside another query, use
    WHERE salary > (SELECT AVG(salary) FROM employees)
    ORDER BY salary DESC;
    ```
-   **Explanation**: The subquery `(SELECT AVG(salary) FROM employees)` calculates the average salary across all employees. The outer query then selects employees whose salary exceeds this average.
+   **Explanation**: The subquery calculates the average salary. The outer query selects employees with salaries above this average.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees] -->|WHERE salary >| B[Subquery: SELECT AVG(salary) FROM employees]
+       B -->|Returns average| C[Filter employees]
+       C -->|Output| D[Result: Employees with above-average salary]
+   ```
 
 2. **Find employees in the Engineering department**
    ```sql
@@ -113,7 +119,13 @@ A **subquery** in the `WHERE` clause is a query nested inside another query, use
        WHERE department_name = 'Engineering'
    );
    ```
-   **Explanation**: The subquery retrieves the `department_id` for the Engineering department. The outer query uses this ID to select employees in that department.
+   **Explanation**: The subquery retrieves the `department_id` for Engineering, used to filter employees in the outer query.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees] -->|WHERE department_id =| B[Subquery: SELECT department_id FROM departments]
+       B -->|Returns department_id| C[Filter employees]
+       C -->|Output| D[Result: Engineering employees]
+   ```
 
 3. **Find employees in departments located in Building B**
    ```sql
@@ -129,9 +141,15 @@ A **subquery** in the `WHERE` clause is a query nested inside another query, use
        WHERE location = 'Building B'
    );
    ```
-   **Explanation**: The subquery returns a list of `department_id`s for departments in Building B (Marketing and Human Resources). The `IN` operator checks if the employee’s `department_id` is in this list.
+   **Explanation**: The subquery returns `department_id`s for departments in Building B, and the outer query uses `IN` to filter employees.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees] -->|WHERE department_id IN| B[Subquery: SELECT department_id FROM departments]
+       B -->|Returns list of department_ids| C[Filter employees]
+       C -->|Output| D[Result: Employees in Building B]
+   ```
 
-4. **Find employees hired before the most recent hire in the company**
+4. **Find employees hired before the most recent hire**
    ```sql
    SELECT 
        employee_id,
@@ -142,7 +160,13 @@ A **subquery** in the `WHERE` clause is a query nested inside another query, use
    WHERE hire_date < (SELECT MAX(hire_date) FROM employees)
    ORDER BY hire_date;
    ```
-   **Explanation**: The subquery finds the latest `hire_date` in the `employees` table. The outer query selects employees hired before this date.
+   **Explanation**: The subquery finds the latest `hire_date`, and the outer query selects employees hired before it.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees] -->|WHERE hire_date <| B[Subquery: SELECT MAX(hire_date) FROM employees]
+       B -->|Returns latest hire_date| C[Filter employees]
+       C -->|Output| D[Result: Employees before latest hire]
+   ```
 
 5. **Find employees with a salary greater than the minimum salary in Finance**
    ```sql
@@ -163,22 +187,30 @@ A **subquery** in the `WHERE` clause is a query nested inside another query, use
    )
    ORDER BY salary;
    ```
-   **Explanation**: The inner subquery finds the `department_id` for Finance. The outer subquery finds the minimum salary in that department. The main query selects employees whose salary exceeds this minimum.
+   **Explanation**: The inner subquery finds the `department_id` for Finance, the outer subquery finds the minimum salary in Finance, and the main query selects employees with higher salaries.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees] -->|WHERE salary >| B[Subquery: SELECT MIN(salary) FROM employees]
+       B -->|WHERE department_id =| C[Subquery: SELECT department_id FROM departments]
+       C -->|Returns Finance department_id| B
+       B -->|Returns min salary| D[Filter employees]
+       D -->|Output| E[Result: Employees above Finance min salary]
+   ```
 
 ---
 
 ## Topic 2: Subqueries in SELECT Clause
 
 ### Explanation
-A subquery in the `SELECT` clause is used to compute a value for each row in the result set. These subqueries are often **correlated**, meaning they reference a column from the outer query, and they run for each row of the outer query.
+A subquery in the `SELECT` clause computes a value for each row in the result set. These are often **correlated**, referencing columns from the outer query and running for each row.
 
 ### Why Use It?
-- To include additional computed data (e.g., department names, averages) in the result set.
-- To avoid complex joins when retrieving related data.
+- Include related data (e.g., department names) without joins.
+- Compute row-specific values (e.g., differences from averages).
 
 ### Examples
 
-1. **Display employee info with their department name**
+1. **Display employee info with department name**
    ```sql
    SELECT 
        e.employee_id,
@@ -189,9 +221,15 @@ A subquery in the `SELECT` clause is used to compute a value for each row in the
    FROM employees e
    ORDER BY e.department_id;
    ```
-   **Explanation**: For each employee, the subquery retrieves the `department_name` corresponding to their `department_id`.
+   **Explanation**: The subquery retrieves the `department_name` for each employee’s `department_id`.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT department_name FROM departments]
+       B -->|Returns department_name| C[Add to result]
+       C -->|Output| D[Result: Employees with department names]
+   ```
 
-2. **Show each employee’s salary and their department’s average salary**
+2. **Show employee’s salary and department average**
    ```sql
    SELECT 
        e.employee_id,
@@ -202,7 +240,13 @@ A subquery in the `SELECT` clause is used to compute a value for each row in the
    FROM employees e
    ORDER BY e.department_id, e.salary DESC;
    ```
-   **Explanation**: The subquery calculates the average salary for the employee’s department, which is displayed alongside their details.
+   **Explanation**: The subquery calculates the average salary for each employee’s department.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT AVG(salary) FROM employees]
+       B -->|Returns dept avg salary| C[Add to result]
+       C -->|Output| D[Result: Employees with dept avg salary]
+   ```
 
 3. **Calculate salary difference from department average**
    ```sql
@@ -215,9 +259,15 @@ A subquery in the `SELECT` clause is used to compute a value for each row in the
    FROM employees e
    ORDER BY e.department_id, salary_diff DESC;
    ```
-   **Explanation**: The subquery computes the department’s average salary, and the outer query subtracts it from the employee’s salary to show the difference.
+   **Explanation**: The subquery computes the department’s average salary, and the outer query calculates the difference.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT AVG(salary) FROM employees]
+       B -->|Returns dept avg salary| C[Calculate salary_diff]
+       C -->|Output| D[Result: Employees with salary difference]
+   ```
 
-4. **Show employee’s hire date and days since the earliest hire in their department**
+4. **Show days since earliest hire in department**
    ```sql
    SELECT 
        e.employee_id,
@@ -228,9 +278,15 @@ A subquery in the `SELECT` clause is used to compute a value for each row in the
    FROM employees e
    ORDER BY e.department_id, e.hire_date;
    ```
-   **Explanation**: The subquery finds the earliest `hire_date` in the employee’s department, and the outer query calculates the difference in days.
+   **Explanation**: The subquery finds the earliest `hire_date` in the department, and the outer query calculates the difference in days.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT MIN(hire_date) FROM employees]
+       B -->|Returns earliest hire_date| C[Calculate days_since_first_hire]
+       C -->|Output| D[Result: Employees with days since first hire]
+   ```
 
-5. **Display employee’s name and their department’s location**
+5. **Display department location**
    ```sql
    SELECT 
        e.employee_id,
@@ -240,22 +296,28 @@ A subquery in the `SELECT` clause is used to compute a value for each row in the
    FROM employees e
    ORDER BY e.department_id;
    ```
-   **Explanation**: The subquery retrieves the `location` of the employee’s department, which is included in the result set.
+   **Explanation**: The subquery retrieves the department’s `location` for each employee.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT location FROM departments]
+       B -->|Returns dept location| C[Add to result]
+       C -->|Output| D[Result: Employees with dept location]
+   ```
 
 ---
 
 ## Topic 3: Subqueries in FROM Clause
 
 ### Explanation
-A subquery in the `FROM` clause creates a **derived table** (a temporary result set) that can be joined with other tables or used in the main query. This is useful for performing aggregations or transformations before joining with other data.
+A subquery in the `FROM` clause creates a **derived table** (temporary result set) that can be joined or used like a table in the main query.
 
 ### Why Use It?
-- To simplify complex queries by breaking them into manageable parts.
-- To perform aggregations (e.g., averages, counts) and use the results in the main query.
+- Simplify complex queries by breaking them into steps.
+- Perform aggregations before joining with other tables.
 
 ### Examples
 
-1. **Show department statistics (average, min, max salary, and employee count)**
+1. **Show department statistics**
    ```sql
    SELECT 
        d.department_name,
@@ -276,9 +338,14 @@ A subquery in the `FROM` clause creates a **derived table** (a temporary result 
    ) AS dept_stats ON d.department_id = dept_stats.department_id
    ORDER BY dept_stats.avg_salary DESC;
    ```
-   **Explanation**: The subquery creates a derived table with department-level statistics, which is joined with the `departments` table to include department names.
+   **Explanation**: The subquery creates a derived table with department statistics, joined with `departments` to include names.
+   ```mermaid
+   graph TD
+       A[Subquery: SELECT ... FROM employees GROUP BY department_id] -->|Derived Table: dept_stats| B[Outer Query: JOIN with departments]
+       B -->|Output| C[Result: Department statistics]
+   ```
 
-2. **Find employees who earn more than their department’s average salary**
+2. **Find employees above department average**
    ```sql
    SELECT 
        e.employee_id,
@@ -297,9 +364,15 @@ A subquery in the `FROM` clause creates a **derived table** (a temporary result 
    WHERE e.salary > dept_avgs.avg_salary
    ORDER BY d.department_name, e.salary DESC;
    ```
-   **Explanation**: The subquery calculates the average salary per department, and the main query selects employees whose salary exceeds their department’s average.
+   **Explanation**: The subquery calculates department averages, and the main query selects employees above their department’s average.
+   ```mermaid
+   graph TD
+       A[Subquery: SELECT AVG(salary) FROM employees GROUP BY department_id] -->|Derived Table: dept_avgs| B[Outer Query: JOIN with employees, departments]
+       B -->|WHERE salary > avg_salary| C[Filter employees]
+       C -->|Output| D[Result: Employees above dept average]
+   ```
 
-3. **Calculate the percentage of department’s total salary for each employee**
+3. **Calculate salary percentage of department total**
    ```sql
    SELECT 
        e.employee_id,
@@ -315,7 +388,13 @@ A subquery in the `FROM` clause creates a **derived table** (a temporary result 
    ) AS dept_totals ON e.department_id = dept_totals.department_id
    ORDER BY e.department_id, percent_of_dept_total DESC;
    ```
-   **Explanation**: The subquery computes the total salary per department, and the main query calculates each employee’s salary as a percentage of that total.
+   **Explanation**: The subquery computes total salary per department, and the main query calculates each employee’s percentage.
+   ```mermaid
+   graph TD
+       A[Subquery: SELECT SUM(salary) FROM employees GROUP BY department_id] -->|Derived Table: dept_totals| B[Outer Query: JOIN with employees]
+       B -->|Calculate percent| C[Output]
+       C -->|Result| D[Employees with salary percentage]
+   ```
 
 4. **List departments with more than 2 employees**
    ```sql
@@ -330,9 +409,15 @@ A subquery in the `FROM` clause creates a **derived table** (a temporary result 
    ) AS emp_counts ON d.department_id = emp_counts.department_id
    WHERE emp_counts.employee_count > 2;
    ```
-   **Explanation**: The subquery counts employees per department, and the main query filters for departments with more than two employees.
+   **Explanation**: The subquery counts employees per department, and the main query filters departments with more than two employees.
+   ```mermaid
+   graph TD
+       A[Subquery: SELECT COUNT(*) FROM employees GROUP BY department_id] -->|Derived Table: emp_counts| B[Outer Query: JOIN with departments]
+       B -->|WHERE employee_count > 2| C[Filter departments]
+       C -->|Output| D[Result: Departments with >2 employees]
+   ```
 
-5. **Show employees with salaries above the company median**
+5. **Show employees above company median salary**
    ```sql
    SELECT 
        e.employee_id,
@@ -346,18 +431,24 @@ A subquery in the `FROM` clause creates a **derived table** (a temporary result 
    ) AS median ON e.salary > median.median_salary
    ORDER BY e.salary DESC;
    ```
-   **Explanation**: The subquery calculates the median salary across all employees, and the main query selects employees whose salary exceeds this median.
+   **Explanation**: The subquery calculates the median salary, and the main query selects employees above it.
+   ```mermaid
+   graph TD
+       A[Subquery: SELECT percentile_cont(0.5) ... FROM employees] -->|Derived Table: median| B[Outer Query: JOIN with employees]
+       B -->|WHERE salary > median_salary| C[Filter employees]
+       C -->|Output| D[Result: Employees above median salary]
+   ```
 
 ---
 
 ## Topic 4: Correlated Subqueries
 
 ### Explanation
-A **correlated subquery** is a subquery that references columns from the outer query. It runs repeatedly for each row of the outer query, making it slower but powerful for row-by-row comparisons.
+A **correlated subquery** references columns from the outer query and runs for each row, making it slower but useful for row-specific comparisons.
 
 ### Why Use It?
-- To compare each row against a dynamic condition based on related data.
-- To find records that meet criteria relative to their group (e.g., highest salary in a department).
+- Compare rows against dynamic group-based conditions.
+- Find records meeting relative criteria (e.g., highest salary in a department).
 
 ### Examples
 
@@ -377,7 +468,13 @@ A **correlated subquery** is a subquery that references columns from the outer q
    )
    ORDER BY e.department_id;
    ```
-   **Explanation**: For each employee, the subquery finds the maximum salary in their department. The outer query checks if the employee’s salary matches this maximum.
+   **Explanation**: The subquery finds the maximum salary for each employee’s department, and the outer query selects matching employees.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT MAX(salary) FROM employees e2]
+       B -->|Returns max salary| C[Filter if salary matches]
+       C -->|Output| D[Result: Highest-paid employees per dept]
+   ```
 
 2. **Find employees hired first in their department**
    ```sql
@@ -395,7 +492,13 @@ A **correlated subquery** is a subquery that references columns from the outer q
    )
    ORDER BY e.department_id;
    ```
-   **Explanation**: The subquery finds the earliest `hire_date` in the employee’s department, and the outer query selects employees with that date.
+   **Explanation**: The subquery finds the earliest `hire_date` in the department, and the outer query selects employees with that date.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT MIN(hire_date) FROM employees e2]
+       B -->|Returns earliest hire_date| C[Filter if hire_date matches]
+       C -->|Output| D[Result: First-hired employees per dept]
+   ```
 
 3. **Rank employees by salary within their department**
    ```sql
@@ -414,9 +517,15 @@ A **correlated subquery** is a subquery that references columns from the outer q
    FROM employees e
    ORDER BY e.department_id, salary_rank;
    ```
-   **Explanation**: The subquery counts how many employees in the same department have a higher salary, adding 1 to determine the rank.
+   **Explanation**: The subquery counts employees with higher salaries in the same department to assign a rank.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT COUNT(*) + 1 FROM employees e2]
+       B -->|Returns rank| C[Add to result]
+       C -->|Output| D[Result: Employees with salary ranks]
+   ```
 
-4. **Find employees whose salary is above their department’s minimum by 20%**
+4. **Find employees with salary 20% above department minimum**
    ```sql
    SELECT 
        e.employee_id,
@@ -431,9 +540,15 @@ A **correlated subquery** is a subquery that references columns from the outer q
    )
    ORDER BY e.department_id, e.salary;
    ```
-   **Explanation**: The subquery finds the minimum salary in the employee’s department and multiplies it by 1.2. The outer query selects employees whose salary exceeds this value.
+   **Explanation**: The subquery calculates 120% of the department’s minimum salary, and the outer query selects employees above this.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT MIN(salary) * 1.2 FROM employees e2]
+       B -->|Returns threshold| C[Filter if salary > threshold]
+       C -->|Output| D[Result: Employees above 120% of min]
+   ```
 
-5. **Find employees hired within 6 months of their department’s first hire**
+5. **Find employees hired within 6 months of department’s first hire**
    ```sql
    SELECT 
        e.employee_id,
@@ -448,18 +563,24 @@ A **correlated subquery** is a subquery that references columns from the outer q
    )
    ORDER BY e.department_id, e.hire_date;
    ```
-   **Explanation**: The subquery finds the earliest `hire_date` in the department and adds 6 months. The outer query selects employees hired within that period.
+   **Explanation**: The subquery adds 6 months to the department’s earliest `hire_date`, and the outer query selects employees hired within that period.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT MIN(hire_date) + 6 months FROM employees e2]
+       B -->|Returns threshold date| C[Filter if hire_date <= threshold]
+       C -->|Output| D[Result: Employees within 6 months of first hire]
+   ```
 
 ---
 
 ## Topic 5: EXISTS and NOT EXISTS
 
 ### Explanation
-The `EXISTS` operator checks if a subquery returns at least one row, while `NOT EXISTS` checks if a subquery returns no rows. These are often used in correlated subqueries to test for the presence or absence of related data.
+`EXISTS` checks if a subquery returns at least one row, while `NOT EXISTS` checks for no rows. These are often correlated and used to test for related data.
 
 ### Why Use It?
-- To filter rows based on whether related data exists.
-- To identify records with or without matching records in another table.
+- Filter rows based on the presence or absence of related data.
+- Identify records with or without matches in another table.
 
 ### Examples
 
@@ -476,7 +597,13 @@ The `EXISTS` operator checks if a subquery returns at least one row, while `NOT 
    )
    ORDER BY d.department_id;
    ```
-   **Explanation**: The subquery checks if there is at least one employee in the department. If true, the department is included in the result.
+   **Explanation**: The subquery checks for employees in each department, including departments with matches.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM departments d] -->|For each row| B[Subquery: SELECT 1 FROM employees e]
+       B -->|True/False| C[Include if EXISTS]
+       C -->|Output| D[Result: Departments with employees]
+   ```
 
 2. **Find departments with no employees**
    ```sql
@@ -490,7 +617,13 @@ The `EXISTS` operator checks if a subquery returns at least one row, while `NOT 
        WHERE e.department_id = d.department_id
    );
    ```
-   **Explanation**: The subquery checks for employees in the department. If no employees are found, the department is included.
+   **Explanation**: The subquery checks for employees; departments with no matches are included.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM departments d] -->|For each row| B[Subquery: SELECT 1 FROM employees e]
+       B -->|True/False| C[Include if NOT EXISTS]
+       C -->|Output| D[Result: Departments with no employees]
+   ```
 
 3. **Find departments with employees earning over 90000**
    ```sql
@@ -506,9 +639,15 @@ The `EXISTS` operator checks if a subquery returns at least one row, while `NOT 
    )
    ORDER BY d.department_id;
    ```
-   **Explanation**: The subquery checks for employees in the department with a salary above 90000. Departments with such employees are selected.
+   **Explanation**: The subquery checks for high-earning employees in each department.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM departments d] -->|For each row| B[Subquery: SELECT 1 FROM employees e WHERE salary > 90000]
+       B -->|True/False| C[Include if EXISTS]
+       C -->|Output| D[Result: Departments with high earners]
+   ```
 
-4. **Find employees who don’t share a hire year with others**
+4. **Find employees with unique hire years**
    ```sql
    SELECT 
        e.employee_id,
@@ -524,7 +663,13 @@ The `EXISTS` operator checks if a subquery returns at least one row, while `NOT 
    )
    ORDER BY hire_year;
    ```
-   **Explanation**: The subquery checks if any other employee was hired in the same year. If none exist, the employee is included.
+   **Explanation**: The subquery checks for other employees hired in the same year; employees with unique hire years are selected.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM employees e] -->|For each row| B[Subquery: SELECT 1 FROM employees e2 WHERE same hire year]
+       B -->|True/False| C[Include if NOT EXISTS]
+       C -->|Output| D[Result: Employees with unique hire years]
+   ```
 
 5. **Find departments with employees hired in 2020**
    ```sql
@@ -540,19 +685,25 @@ The `EXISTS` operator checks if a subquery returns at least one row, while `NOT 
    )
    ORDER BY d.department_id;
    ```
-   **Explanation**: The subquery checks for employees hired in 2020 in each department. Departments with such employees are returned.
+   **Explanation**: The subquery checks for employees hired in 2020, and departments with such employees are selected.
+   ```mermaid
+   graph TD
+       A[Outer Query: SELECT ... FROM departments d] -->|For each row| B[Subquery: SELECT 1 FROM employees e WHERE hire_year = 2020]
+       B -->|True/False| C[Include if EXISTS]
+       C -->|Output| D[Result: Departments with 2020 hires]
+   ```
 
 ---
 
 ## Topic 6: Common Table Expressions (CTEs)
 
 ### Explanation
-A **Common Table Expression (CTE)** is a temporary result set defined within a `WITH` clause. It can be referenced multiple times in the main query, making complex queries more readable and maintainable.
+A **CTE** is a temporary result set defined in a `WITH` clause, reusable in the main query, improving readability and maintainability.
 
 ### Why Use It?
-- To break down complex queries into reusable parts.
-- To improve query readability and organization.
-- To perform calculations that need to be reused in multiple parts of a query.
+- Break down complex queries into modular parts.
+- Reuse intermediate results multiple times.
+- Enhance query clarity.
 
 ### Examples
 
@@ -576,9 +727,14 @@ A **Common Table Expression (CTE)** is a temporary result set defined within a `
    JOIN departments d ON ds.department_id = d.department_id
    ORDER BY ds.total_salary DESC;
    ```
-   **Explanation**: The CTE `dept_stats` computes department-level statistics, which are joined with the `departments` table to include department names.
+   **Explanation**: The CTE computes department statistics, joined with `departments` for names.
+   ```mermaid
+   graph TD
+       A[CTE: WITH dept_stats AS (...)] -->|Temporary Result: dept_stats| B[Main Query: JOIN with departments]
+       B -->|Output| C[Result: Department statistics]
+   ```
 
-2. **Find employees earning more than 10% above their department’s average**
+2. **Find employees earning 10% above department average**
    ```sql
    WITH dept_avg_salary AS (
        SELECT 
@@ -601,9 +757,15 @@ A **Common Table Expression (CTE)** is a temporary result set defined within a `
    WHERE e.salary > das.avg_salary * 1.1
    ORDER BY salary_difference DESC;
    ```
-   **Explanation**: The CTE calculates the average salary per department, and the main query selects employees whose salary is more than 10% above this average.
+   **Explanation**: The CTE calculates department averages, and the main query selects employees above 110% of the average.
+   ```mermaid
+   graph TD
+       A[CTE: WITH dept_avg_salary AS (...)] -->|Temporary Result: dept_avg_salary| B[Main Query: JOIN with employees, departments]
+       B -->|WHERE salary > avg_salary * 1.1| C[Filter employees]
+       C -->|Output| D[Result: Employees above 110% of dept avg]
+   ```
 
-3. **Rank employees by hire date within their department**
+3. **Rank employees by hire date**
    ```sql
    WITH hire_rank AS (
        SELECT 
@@ -626,9 +788,15 @@ A **Common Table Expression (CTE)** is a temporary result set defined within a `
    JOIN departments d ON hr.department_id = d.department_id
    WHERE hr.hire_rank = 1;
    ```
-   **Explanation**: The CTE assigns a rank to employees based on their hire date within their department. The main query selects the first hired employee per department.
+   **Explanation**: The CTE ranks employees by hire date per department, and the main query selects the earliest hires.
+   ```mermaid
+   graph TD
+       A[CTE: WITH hire_rank AS (...)] -->|Temporary Result: hire_rank| B[Main Query: JOIN with departments]
+       B -->|WHERE hire_rank = 1| C[Filter first hires]
+       C -->|Output| D[Result: First-hired employees per dept]
+   ```
 
-4. **Calculate running total of salaries by department**
+4. **Calculate running total of salaries**
    ```sql
    WITH salary_sums AS (
        SELECT 
@@ -651,7 +819,12 @@ A **Common Table Expression (CTE)** is a temporary result set defined within a `
    JOIN departments d ON ss.department_id = d.department_id
    ORDER BY d.department_name, ss.salary;
    ```
-   **Explanation**: The CTE uses a window function to calculate a running total of salaries within each department, ordered by salary.
+   **Explanation**: The CTE calculates a running total of salaries per department, ordered by salary.
+   ```mermaid
+   graph TD
+       A[CTE: WITH salary_sums AS (...)] -->|Temporary Result: salary_sums| B[Main Query: JOIN with departments]
+       B -->|Output| C[Result: Employees with running salary totals]
+   ```
 
 5. **Find departments with above-average employee count**
    ```sql
@@ -673,14 +846,20 @@ A **Common Table Expression (CTE)** is a temporary result set defined within a `
    )
    ORDER BY dc.employee_count DESC;
    ```
-   **Explanation**: The CTE counts employees per department, and the main query selects departments with an employee count above the average across all departments.
+   **Explanation**: The CTE counts employees per department, and the main query selects departments above the average count.
+   ```mermaid
+   graph TD
+       A[CTE: WITH dept_counts AS (...)] -->|Temporary Result: dept_counts| B[Main Query: JOIN with departments]
+       B -->|WHERE employee_count > AVG| C[Filter departments]
+       C -->|Output| D[Result: Departments with above-average count]
+   ```
 
 ---
 
 ## Topic 7: Recursive CTEs
 
 ### Explanation
-A **Recursive CTE** is a CTE that refers to itself, used to handle hierarchical or recursive data (e.g., organizational charts, category trees). It consists of a **base case** (initial rows) and a **recursive case** (rows derived from previous results).
+A **Recursive CTE** refers to itself to handle hierarchical or recursive data, with a **base case** (initial rows) and a **recursive case** (rows built from previous results).
 
 ### Setup: Hierarchical Table
 ```sql
@@ -712,7 +891,6 @@ VALUES
 1. **Traverse the entire employee hierarchy**
    ```sql
    WITH RECURSIVE employee_tree AS (
-       -- Base case: CEO (no manager)
        SELECT 
            employee_id, 
            name, 
@@ -725,7 +903,6 @@ VALUES
        
        UNION ALL
        
-       -- Recursive case: employees reporting to previous level
        SELECT 
            e.employee_id, 
            e.name, 
@@ -745,12 +922,18 @@ VALUES
    FROM employee_tree
    ORDER BY path;
    ```
-   **Explanation**: The base case selects the CEO (no manager). The recursive case joins employees with their managers from the previous level, building a path string.
+   **Explanation**: The base case selects the CEO, and the recursive case builds the hierarchy by joining employees with their managers.
+   ```mermaid
+   graph TD
+       A[Base Case: SELECT ... WHERE manager_id IS NULL] -->|CEO| B[Recursive CTE]
+       B -->|UNION ALL| C[Recursive Case: JOIN with employee_tree]
+       C -->|Iterate| B
+       B -->|Output| D[Result: Full hierarchy]
+   ```
 
 2. **Find all reports under the CTO (employee_id = 2)**
    ```sql
    WITH RECURSIVE subordinates AS (
-       -- Base case: direct reports to CTO
        SELECT 
            employee_id, 
            name, 
@@ -762,7 +945,6 @@ VALUES
        
        UNION ALL
        
-       -- Recursive case: reports of reports
        SELECT 
            e.employee_id, 
            e.name, 
@@ -780,7 +962,14 @@ VALUES
    FROM subordinates
    ORDER BY depth, name;
    ```
-   **Explanation**: The base case selects direct reports of the CTO. The recursive case finds their reports, continuing down the hierarchy.
+   **Explanation**: The base case selects direct reports of the CTO, and the recursive case finds their reports.
+   ```mermaid
+   graph TD
+       A[Base Case: SELECT ... WHERE manager_id = 2] -->|CTO's reports| B[Recursive CTE]
+       B -->|UNION ALL| C[Recursive Case: JOIN with subordinates]
+       C -->|Iterate| B
+       B -->|Output| D[Result: CTO's subordinates]
+   ```
 
 3. **Count employees under each manager**
    ```sql
@@ -812,9 +1001,17 @@ VALUES
    GROUP BY h.manager_id
    ORDER BY total_reports DESC;
    ```
-   **Explanation**: The CTE builds the hierarchy, and the main query counts the number of direct and indirect reports for each manager.
+   **Explanation**: The CTE builds the hierarchy, and the main query counts reports per manager.
+   ```mermaid
+   graph TD
+       A[Base Case: SELECT ... WHERE manager_id IS NULL] -->|CEO| B[Recursive CTE]
+       B -->|UNION ALL| C[Recursive Case: JOIN with hierarchy]
+       C -->|Iterate| B
+       B -->|Temporary Result| D[Main Query: GROUP BY manager_id]
+       D -->|Output| E[Result: Manager report counts]
+   ```
 
-4. **Show hierarchy with level indentation**
+4. **Show hierarchy with indentation**
    ```sql
    WITH RECURSIVE employee_tree AS (
        SELECT 
@@ -848,7 +1045,15 @@ VALUES
    FROM employee_tree
    ORDER BY path;
    ```
-   **Explanation**: The CTE builds the hierarchy, and the `REPEAT` function indents names based on their depth for a visual representation.
+   **Explanation**: The CTE builds the hierarchy, and `REPEAT` indents names based on depth.
+   ```mermaid
+   graph TD
+       A[Base Case: SELECT ... WHERE manager_id IS NULL] -->|CEO| B[Recursive CTE]
+       B -->|UNION ALL| C[Recursive Case: JOIN with employee_tree]
+       C -->|Iterate| B
+       B -->|Temporary Result| D[Main Query: Indent names]
+       D -->|Output| E[Result: Indented hierarchy]
+   ```
 
 5. **Find the deepest level in the hierarchy**
    ```sql
@@ -882,13 +1087,21 @@ VALUES
    WHERE depth = (SELECT MAX(depth) FROM employee_tree)
    ORDER BY name;
    ```
-   **Explanation**: The CTE calculates the depth of each employee in the hierarchy. The main query selects employees at the maximum depth.
+   **Explanation**: The CTE calculates hierarchy depth, and the main query selects employees at the maximum depth.
+   ```mermaid
+   graph TD
+       A[Base Case: SELECT ... WHERE manager_id IS NULL] -->|CEO| B[Recursive CTE]
+       B -->|UNION ALL| C[Recursive Case: JOIN with employee_tree]
+       C -->|Iterate| B
+       B -->|Temporary Result| D[Main Query: WHERE depth = MAX(depth)]
+       D -->|Output| E[Result: Deepest hierarchy level]
+   ```
 
 ---
 
 ## Practice Exercises
 
-To reinforce your learning, try these exercises using the `retail_store` database (assume it has tables: `products`, `orders`, `order_details`, `customers`, `categories`).
+Using the `retail_store` database (with tables: `products`, `orders`, `order_details`, `customers`, `categories`), try these exercises:
 
 1. **Subqueries in WHERE Clause**
    - Find products with a price higher than the average price.
@@ -900,7 +1113,7 @@ To reinforce your learning, try these exercises using the `retail_store` databas
 2. **Subqueries in SELECT Clause**
    - Display each order with its customer’s name.
    - Show each product’s price and its category’s average price.
-   - Calculate the discount percentage for each order (assuming a discount column).
+   - Calculate the discount percentage for each order (assume a discount column).
    - Show each customer’s total spending and the average spending across all customers.
    - Display each product with the number of orders it appears in.
 
@@ -951,5 +1164,5 @@ To reinforce your learning, try these exercises using the `retail_store` databas
 
 ---
 
-This guide provides a comprehensive introduction to subqueries and CTEs in PostgreSQL, with detailed explanations and practical examples. Work through the examples and exercises to build your skills, and refer to the additional resources for further learning.
+This guide provides a comprehensive introduction to subqueries and CTEs in PostgreSQL, enhanced with Mermaid.js diagrams to visualize query logic. Work through the examples and exercises to build your skills, and refer to the additional resources for further learning.
 

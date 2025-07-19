@@ -1,14 +1,94 @@
+
+
 # Day 4: Transactions and Concurrency Control
+
+This document provides an overview of database transactions and concurrency control, including definitions, examples, and visualizations using Mermaid.js diagrams to help students understand these concepts more effectively.
 
 ## Topics Covered
 
-1. Understanding database transactions
-2. ACID properties
-3. Transaction isolation levels
-4. Concurrency issues (Dirty reads, Non-repeatable reads, Phantom reads)
-5. Locking mechanisms
-6. Deadlocks and how to avoid them
-7. Optimistic vs. Pessimistic concurrency control
+1. **Understanding Database Transactions**  
+   A transaction is a sequence of database operations that are treated as a single unit of work, ensuring data integrity. Transactions either complete fully or not at all.
+
+2. **ACID Properties**  
+   - **Atomicity**: Ensures all operations in a transaction are completed; if any fail, the entire transaction is rolled back.  
+   - **Consistency**: Guarantees the database remains in a valid state before and after a transaction.  
+   - **Isolation**: Ensures transactions are executed independently of one another.  
+   - **Durability**: Guarantees that committed transactions are permanently saved, even in case of a system failure.
+
+3. **Transaction Isolation Levels**  
+   Isolation levels define how transactions interact and control visibility of changes. Supported levels in PostgreSQL:  
+   - READ UNCOMMITTED (behaves like READ COMMITTED in PostgreSQL)  
+   - READ COMMITTED (default)  
+   - REPEATABLE READ  
+   - SERIALIZABLE  
+
+4. **Concurrency Issues**  
+   - **Dirty Reads**: Reading uncommitted changes from another transaction.  
+   - **Non-repeatable Reads**: Data changes between reads within the same transaction.  
+   - **Phantom Reads**: New rows appear in a query’s result set during a transaction.
+
+5. **Locking Mechanisms**  
+   Locks control access to database resources to prevent conflicts during concurrent transactions. Examples include row-level locks (`FOR UPDATE`) and table-level locks.
+
+6. **Deadlocks and How to Avoid Them**  
+   A deadlock occurs when two transactions wait indefinitely for each other to release resources. Prevention includes consistent lock ordering and timeouts.
+
+7. **Optimistic vs. Pessimistic Concurrency Control**  
+   - **Optimistic**: Assumes conflicts are rare, checks for conflicts at commit time (e.g., using version numbers).  
+   - **Pessimistic**: Locks resources during the transaction to prevent conflicts.
+
+## Mermaid.js Diagrams
+
+### Transaction Flow
+This diagram illustrates the basic flow of a database transaction.
+
+```mermaid
+graph TD
+    A[Begin Transaction] --> B[Execute Operations]
+    B --> C{Check Constraints}
+    C -->|Valid| D[Commit Transaction]
+    C -->|Invalid| E[Rollback Transaction]
+    D --> F[Changes Saved]
+    E --> G[Changes Discarded]
+```
+
+### Concurrency Issues
+This diagram shows how different transactions can lead to concurrency issues like dirty reads.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: UPDATE accounts SET balance = 900 WHERE account_id = 1
+    T2->>DB: BEGIN
+    T2->>DB: SELECT balance FROM accounts WHERE account_id = 1
+    Note right of T2: Reads uncommitted data (900) - Dirty Read
+    T1->>DB: ROLLBACK
+    T2->>DB: COMMIT
+```
+
+### Deadlock Scenario
+This diagram demonstrates a deadlock caused by inconsistent lock ordering.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: UPDATE orders SET total_amount = 100 WHERE order_id = 1
+    T2->>DB: BEGIN
+    T2->>DB: UPDATE order_items SET quantity = 5 WHERE item_id = 3
+    T1->>DB: UPDATE order_items SET quantity = 3 WHERE item_id = 1
+    Note right of T1: Waits for T2 to release order_items
+    T2->>DB: UPDATE orders SET total_amount = 125 WHERE order_id = 2
+    Note right of T2: Waits for T1 to release orders
+    Note over T1,T2: Deadlock Detected!
+```
 
 ## Examples and Exercises
 
@@ -336,31 +416,32 @@ END;
 
 ## Practice Exercises
 
-1. Simulate a bank transfer system:
-   - Create tables for accounts and transactions
-   - Implement transactions to transfer money between accounts
-   - Ensure that accounts never go negative
-   - Handle concurrent transfer scenarios
+1. **Simulate a Bank Transfer System**  
+   - Create tables for accounts and transactions.  
+   - Implement transactions to transfer money between accounts.  
+   - Ensure accounts never go negative.  
+   - Handle concurrent transfer scenarios.
 
-2. Implement an inventory management system:
-   - Create tables for products, inventory, and orders
-   - Implement transactions for order processing
-   - Ensure inventory is checked and updated atomically
-   - Handle concurrent orders for the same product
+2. **Implement an Inventory Management System**  
+   - Create tables for products, inventory, and orders.  
+   - Implement transactions for order processing.  
+   - Ensure inventory is checked and updated atomically.  
+   - Handle concurrent orders for the same product.
 
-3. Experiment with different isolation levels:
-   - Compare the behavior of READ COMMITTED, REPEATABLE READ, and SERIALIZABLE
-   - Identify scenarios where each isolation level is appropriate
-   - Simulate the concurrency issues each level addresses
+3. **Experiment with Different Isolation Levels**  
+   - Compare the behavior of READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  
+   - Identify scenarios where each isolation level is appropriate.  
+   - Simulate the concurrency issues each level addresses.
 
-4. Implement optimistic concurrency control:
-   - Create a wiki-like system with versioned documents
-   - Allow multiple users to edit documents concurrently
-   - Implement version checking to prevent lost updates
+4. **Implement Optimistic Concurrency Control**  
+   - Create a wiki-like system with versioned documents.  
+   - Allow multiple users to edit documents concurrently.  
+   - Implement version checking to prevent lost updates.
 
-5. Simulate and resolve deadlocks:
-   - Create a scenario that produces a deadlock
-   - Implement a solution using proper lock ordering
-   - Use timeouts and retry logic to handle deadlocks gracefully
+5. **Simulate and Resolve Deadlocks**  
+   - Create a scenario that produces a deadlock.  
+   - Implement a solution using proper lock ordering.  
+   - Use timeouts and retry logic to handle deadlocks gracefully.
 
 See the [exercises.sql](exercises.sql) file for detailed examples and solutions to these exercises.
+
