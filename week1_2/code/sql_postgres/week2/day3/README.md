@@ -2,7 +2,6 @@
 
 # Week 2, Day 3: PostgreSQL Indexes and Query Optimization
 
-This guide simplifies PostgreSQL indexes and query optimization for beginners. It uses clear explanations, examples, and Mermaid.js diagrams to make concepts easy to understand. The content is based on the provided `examples.sql` and `exercises.sql` files, with added examples and visuals for clarity.
 
 ## Table of Contents
 1. [What Are Indexes?](#what-are-indexes)

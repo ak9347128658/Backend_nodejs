@@ -4,8 +4,6 @@
 
 ## Overview
 
-This document explores PostgreSQL's powerful JSON, JSONB, and array data types, which enable flexible storage and querying of complex data structures. It includes practical examples, Mermaid.js diagrams for visualization, and exercises to reinforce learning. The focus is on understanding JSON/JSONB operations, array manipulation, indexing for performance, and combining these features for advanced use cases.
-
 ## Topics Covered
 
 1. **Working with JSON and JSONB Data Types**

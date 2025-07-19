@@ -2,8 +2,6 @@
 
 # Day 4: Transactions and Concurrency Control
 
-This document provides an overview of database transactions and concurrency control, including definitions, examples, and visualizations using Mermaid.js diagrams to help students understand these concepts more effectively.
-
 ## Topics Covered
 
 1. **Understanding Database Transactions**  
@@ -40,7 +38,7 @@ This document provides an overview of database transactions and concurrency cont
 ## Mermaid.js Diagrams
 
 ### Transaction Flow
-This diagram illustrates the basic flow of a database transaction.
+This diagram illustrates the basic flow of a database transaction, showing the sequence from starting a transaction to either committing or rolling back based on constraint validation.
 
 ```mermaid
 graph TD
@@ -52,8 +50,15 @@ graph TD
     E --> G[Changes Discarded]
 ```
 
-### Concurrency Issues
-This diagram shows how different transactions can lead to concurrency issues like dirty reads.
+**Explanation:**  
+- The transaction starts with `BEGIN`.  
+- Operations (e.g., `INSERT`, `UPDATE`) are executed.  
+- Constraints are checked to ensure data integrity.  
+- If valid, the transaction is committed, saving changes permanently.  
+- If invalid, the transaction is rolled back, discarding changes.
+
+### Concurrency Issue: Dirty Reads
+This diagram illustrates a scenario where dirty reads occur due to overlapping transactions, allowing one transaction to read uncommitted changes from another.
 
 ```mermaid
 sequenceDiagram
@@ -70,8 +75,66 @@ sequenceDiagram
     T2->>DB: COMMIT
 ```
 
+**Explanation:**  
+- **Transaction 1 (T1)** starts and updates an account's balance to 900.  
+- **Transaction 2 (T2)** reads the uncommitted balance (900), causing a dirty read.  
+- T1 rolls back, reverting the balance, but T2 has already seen the incorrect value.  
+- This issue is prevalent in `READ UNCOMMITTED` isolation but mitigated in higher levels like `READ COMMITTED`.
+
+### Concurrency Issue: Non-repeatable Reads
+This diagram shows a non-repeatable read, where a transaction reads the same data twice but gets different results due to another transaction's commit.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: SELECT balance FROM accounts WHERE account_id = 1
+    Note right of T1: Reads balance = 1000
+    T2->>DB: BEGIN
+    T2->>DB: UPDATE accounts SET balance = 1200 WHERE account_id = 1
+    T2->>DB: COMMIT
+    T1->>DB: SELECT balance FROM accounts WHERE account_id = 1
+    Note right of T1: Reads balance = 1200 (Non-repeatable Read)
+    T1->>DB: COMMIT
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** reads the balance (1000).  
+- **Transaction 2 (T2)** updates the balance to 1200 and commits.  
+- T1 reads the balance again, now seeing 1200, which differs from the first read.  
+- This occurs in `READ COMMITTED` but is prevented in `REPEATABLE READ` or `SERIALIZABLE`.
+
+### Concurrency Issue: Phantom Reads
+This diagram illustrates a phantom read, where a transaction re-executes a query and finds new rows due to another transaction’s insert.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: SELECT * FROM accounts WHERE balance > 1000
+    Note right of T1: Gets 2 rows
+    T2->>DB: BEGIN
+    T2->>DB: INSERT INTO accounts (customer_name, balance) VALUES ('Eve', 1500)
+    T2->>DB: COMMIT
+    T1->>DB: SELECT * FROM accounts WHERE balance > 1000
+    Note right of T1: Gets 3 rows (Phantom Read)
+    T1->>DB: COMMIT
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** queries accounts with balance > 1000, getting 2 rows.  
+- **Transaction 2 (T2)** inserts a new account with balance 1500 and commits.  
+- T1 re-runs the query, now getting 3 rows, including the new row (phantom read).  
+- This occurs in `READ COMMITTED` and `REPEATABLE READ` but is prevented in `SERIALIZABLE`.
+
 ### Deadlock Scenario
-This diagram demonstrates a deadlock caused by inconsistent lock ordering.
+This diagram demonstrates a deadlock caused by inconsistent lock ordering, where two transactions wait indefinitely for each other’s resources.
 
 ```mermaid
 sequenceDiagram
@@ -89,6 +152,69 @@ sequenceDiagram
     Note right of T2: Waits for T1 to release orders
     Note over T1,T2: Deadlock Detected!
 ```
+
+**Explanation:**  
+- **Transaction 1 (T1)** locks the `orders` table.  
+- **Transaction 2 (T2)** locks the `order_items` table.  
+- T1 tries to lock `order_items`, waiting for T2 to release it.  
+- T2 tries to lock `orders`, waiting for T1 to release it, causing a deadlock.  
+- PostgreSQL detects and resolves the deadlock by rolling back one transaction.
+
+### Optimistic Concurrency Control
+This diagram shows how optimistic concurrency control uses version checks to prevent conflicts during concurrent updates.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: SELECT document_id, content, version FROM documents WHERE document_id = 1
+    Note right of T1: Gets version = 1
+    T2->>DB: BEGIN
+    T2->>DB: SELECT document_id, content, version FROM documents WHERE document_id = 1
+    Note right of T2: Gets version = 1
+    T2->>DB: UPDATE documents SET content = 'Updated by T2', version = 2 WHERE document_id = 1 AND version = 1
+    T2->>DB: COMMIT
+    T1->>DB: UPDATE documents SET content = 'Updated by T1', version = 2 WHERE document_id = 1 AND version = 1
+    Note right of T1: Update fails (version mismatch)
+    T1->>DB: ROLLBACK
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** and **Transaction 2 (T2)** read a document with version 1.  
+- T2 updates the document, incrementing the version to 2, and commits.  
+- T1 tries to update but fails because the version is now 2, preventing a lost update.  
+- T1 rolls back or retries after refreshing the data.
+
+### Pessimistic Concurrency Control
+This diagram illustrates pessimistic concurrency control using row-level locks to prevent concurrent modifications.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: SELECT * FROM inventory WHERE product_id = 1 FOR UPDATE
+    Note right of T1: Locks the row
+    T2->>DB: BEGIN
+    T2->>DB: SELECT * FROM inventory WHERE product_id = 1 FOR UPDATE
+    Note right of T2: Waits for T1 to release the lock
+    T1->>DB: UPDATE inventory SET quantity = quantity - 5 WHERE product_id = 1
+    T1->>DB: COMMIT
+    Note right of T2: Lock acquired
+    T2->>DB: UPDATE inventory SET quantity = quantity - 3 WHERE product_id = 1
+    T2->>DB: COMMIT
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** locks a row in the `inventory` table using `FOR UPDATE`.  
+- **Transaction 2 (T2)** tries to lock the same row but waits until T1 commits or rolls back.  
+- T1 updates the quantity and commits, releasing the lock.  
+- T2 then acquires the lock, updates the quantity, and commits, ensuring no conflicts.
 
 ## Examples and Exercises
 
@@ -147,6 +273,31 @@ COMMIT;
 -- Check the results
 SELECT * FROM accounts WHERE account_id IN (1, 3, 4);
 ```
+
+#### Mermaid Diagram: Basic Transaction with Savepoints
+This diagram illustrates the flow of the transaction with savepoints, showing the sequence of updates, savepoint creation, rollback to savepoint, and final commit.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: UPDATE accounts SET balance = balance - 50 WHERE account_id = 3
+    T1->>DB: SAVEPOINT
+    Note right of T1: Savepoint: before_second_update
+    T1->>DB: UPDATE accounts SET balance = balance + 50 WHERE account_id = 4
+    T1->>DB: ROLLBACK TO SAVEPOINT
+    Note right of T1: Reverts second update
+    T1->>DB: UPDATE accounts SET balance = balance + 50 WHERE account_id = 1
+    T1->>DB: COMMIT
+```
+
+**Explanation:**  
+- The transaction starts with `BEGIN`.  
+- Updates the balance of account 3, creates a savepoint, and updates account 4.  
+- Rolls back to the savepoint, undoing the update to account 4.  
+- Performs a new update to account 1 and commits, ensuring only the intended changes are saved.
 
 ### Example 2: Transaction Isolation Levels
 
@@ -209,6 +360,33 @@ BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 COMMIT;
 ```
 
+#### Mermaid Diagram: Transaction Isolation Levels (REPEATABLE READ)
+This diagram illustrates the `REPEATABLE READ` isolation level, showing how Transaction 1 maintains a consistent snapshot despite Transaction 2's update.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ
+    T1->>DB: SELECT balance FROM accounts WHERE account_id = 1
+    Note right of T1: Reads balance = 1200
+    T2->>DB: BEGIN
+    T2->>DB: UPDATE accounts SET balance = balance + 100 WHERE account_id = 1
+    sekundalar arası
+T2->>DB: COMMIT
+    T1->>DB: SELECT balance FROM accounts WHERE account_id = 1
+    Note right of T1: Still reads balance = 1200
+    T1->>DB: COMMIT
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** starts with `REPEATABLE READ` and reads a balance of 1200.  
+- **Transaction 2 (T2)** updates the balance to 1300 and commits.  
+- T1 re-reads the balance and still sees 1200 due to the snapshot isolation.  
+- This demonstrates how `REPEATABLE READ` prevents non-repeatable reads.
+
 ### Example 3: Handling Concurrency Issues
 
 ```sql
@@ -264,6 +442,35 @@ COMMIT;
 -- After Terminal 1 commits, Terminal 2 will see the updated quantity
 -- and can make its decision based on accurate data
 ```
+
+#### Mermaid Diagram: Handling Concurrency with Locking
+This diagram illustrates how explicit locking (`FOR UPDATE`) prevents concurrency issues by forcing Transaction 2 to wait.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: SELECT quantity FROM inventory WHERE product_id = 1 FOR UPDATE
+    Note right of T1: Locks row, sees 7 laptops
+    T2->>DB: BEGIN
+    T2->>DB: SELECT quantity FROM inventory WHERE product_id = 1 FOR UPDATE
+    Note right of T2: Waits for T1 to release lock
+    T1->>DB: UPDATE inventory SET quantity = quantity - 7 WHERE product_id = 1
+    T1->>DB: COMMIT
+    Note right of T2: Lock acquired, sees 0 laptops
+    T2->>DB: UPDATE inventory SET quantity = quantity - 3 WHERE product_id = 1
+    Note right of T2: May fail due to CHECK constraint
+    T2->>DB: COMMIT
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** locks the inventory row with `FOR UPDATE`, preventing modifications.  
+- **Transaction 2 (T2)** tries to lock the same row but waits until T1 commits.  
+- T1 updates the quantity to 0 and commits, releasing the lock.  
+- T2 then sees the updated quantity and attempts an update, which may fail due to constraints.
 
 ### Example 4: Deadlock Prevention and Handling
 
@@ -336,6 +543,30 @@ BEGIN;
 COMMIT;
 ```
 
+#### Mermaid Diagram: Deadlock Prevention with Consistent Lock Ordering
+This diagram illustrates how consistent lock ordering prevents deadlocks by ensuring both transactions update tables in the same sequence.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: UPDATE orders SET total_amount = 100 WHERE order_id = 1
+    T2->>DB: BEGIN
+    T2->>DB: UPDATE orders SET total_amount = 125 WHERE order_id = 2
+    T1->>DB: UPDATE order_items SET quantity = 3 WHERE item_id = 1
+    T1->>DB: COMMIT
+    T2->>DB: UPDATE order_items SET quantity = 5 WHERE item_id = 3
+    T2->>DB: COMMIT
+```
+
+**Explanation:**  
+- Both transactions update the `orders` table first, then the `order_items` table.  
+- This consistent order prevents deadlocks, as neither transaction waits for the other to release a conflicting lock.  
+- Both transactions complete successfully without conflicts.
+
 ### Example 5: Advisory Locks
 
 ```sql
@@ -367,6 +598,34 @@ $$ LANGUAGE plpgsql;
 -- Call the function (open multiple sessions to test)
 SELECT process_data(1);
 ```
+
+#### Mermaid Diagram: Advisory Locks
+This diagram illustrates the use of advisory locks to coordinate access to a process, preventing concurrent execution.
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: SELECT process_data(1)
+    T1->>DB: pg_try_advisory_lock(1)
+    Note right of T1: Acquires lock
+    T1->>DB: Perform work (pg_sleep)
+    T2->>DB: SELECT process_data(1)
+    T2->>DB: pg_try_advisory_lock(1)
+    Note right of T2: Lock denied, process already running
+    T2->>DB: Exit function
+    T1->>DB: pg_advisory_unlock(1)
+    Note right of T1: Releases lock
+    T1->>DB: Complete function
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** acquires an advisory lock for process ID 1 and performs work.  
+- **Transaction 2 (T2)** tries to acquire the same lock but is denied, as T1 holds it.  
+- T2 exits without performing the work.  
+- T1 releases the lock upon completion, allowing future attempts to succeed.
 
 ### Example 6: Optimistic Concurrency Control
 
@@ -413,6 +672,34 @@ BEGIN;
     END IF;
 END;
 ```
+
+#### Mermaid Diagram: Optimistic Concurrency Control
+This diagram illustrates how optimistic concurrency control uses version checks to prevent conflicts during concurrent updates. (This is identical to the earlier optimistic concurrency control diagram, included here for completeness.)
+
+```mermaid
+sequenceDiagram
+    participant T1 as Transaction 1
+    participant T2 as Transaction 2
+    participant DB as Database
+    
+    T1->>DB: BEGIN
+    T1->>DB: SELECT document_id, content, version FROM documents WHERE document_id = 1
+    Note right of T1: Gets version = 1
+    T2->>DB: BEGIN
+    T2->>DB: SELECT document_id, content, version FROM documents WHERE document_id = 1
+    Note right of T2: Gets version = 1
+    T2->>DB: UPDATE documents SET content = 'Updated by T2', version = 2 WHERE document_id = 1 AND version = 1
+    T2->>DB: COMMIT
+    T1->>DB: UPDATE documents SET content = 'Updated by T1', version = 2 WHERE document_id = 1 AND version = 1
+    Note right of T1: Update fails (version mismatch)
+    T1->>DB: ROLLBACK
+```
+
+**Explanation:**  
+- **Transaction 1 (T1)** and **Transaction 2 (T2)** read a document with version 1.  
+- T2 updates the document, incrementing the version to 2, and commits.  
+- T1 tries to update but fails because the version is now 2, preventing a lost update.  
+- T1 rolls back or retries after refreshing the data.
 
 ## Practice Exercises
 
