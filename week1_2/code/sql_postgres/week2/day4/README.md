@@ -141,7 +141,7 @@ sequenceDiagram
     participant T1 as Transaction 1
     participant T2 as Transaction 2
     participant DB as Database
-    
+
     T1->>DB: BEGIN
     T1->>DB: UPDATE orders SET total_amount = 100 WHERE order_id = 1
     T2->>DB: BEGIN
@@ -154,11 +154,12 @@ sequenceDiagram
 ```
 
 **Explanation:**  
-- **Transaction 1 (T1)** locks the `orders` table.  
-- **Transaction 2 (T2)** locks the `order_items` table.  
-- T1 tries to lock `order_items`, waiting for T2 to release it.  
-- T2 tries to lock `orders`, waiting for T1 to release it, causing a deadlock.  
-- PostgreSQL detects and resolves the deadlock by rolling back one transaction.
+- **Transaction 1 (T1)** locks a row in the `orders` table.  
+- **Transaction 2 (T2)** locks a row in the `order_items` table.  
+- T1 then tries to lock `order_items`, but must wait for T2 to release its lock.  
+- T2 tries to lock `orders`, but must wait for T1 to release its lock.  
+- Both transactions are now waiting for each other, resulting in a deadlock.  
+- PostgreSQL automatically detects the deadlock and rolls back one transaction to resolve it.
 
 ### Optimistic Concurrency Control
 This diagram shows how optimistic concurrency control uses version checks to prevent conflicts during concurrent updates.
