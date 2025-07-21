@@ -1,694 +1,1026 @@
+
+
 # Day 1: Advanced PostgreSQL Features
+
+Welcome to the first day of exploring advanced PostgreSQL features! This guide is designed to help you understand powerful PostgreSQL capabilities with clear explanations, practical examples, and visual diagrams created using Mermaid.js. Whether you're new to PostgreSQL or looking to deepen your knowledge, this document will walk you through each topic step-by-step, making complex concepts approachable and engaging. Let's dive into the world of PostgreSQL!
 
 ## Topics Covered
 
 1. **Custom Data Types**
-   - Domain types
-   - Composite types
-   - Enumerated types (ENUM)
-   - Range types
+   - Domain Types
+   - Composite Types
+   - Enumerated Types (ENUM)
+   - Range Types
 
 2. **Inheritance**
-   - Table inheritance
-   - Benefits and limitations
-   - Querying inherited tables
+   - Table Inheritance
+   - Benefits and Limitations
+   - Querying Inherited Tables
 
 3. **Partitioning**
-   - Range partitioning
-   - List partitioning
-   - Hash partitioning
-   - Managing partitions
-   - Partition pruning
+   - Range Partitioning
+   - List Partitioning
+   - Hash Partitioning
+   - Managing Partitions
+   - Partition Pruning
 
 4. **Extensions**
-   - Overview of popular PostgreSQL extensions
-   - Installing and using extensions
-   - PostGIS for spatial data
-   - pg_stat_statements for query analysis
-   - pgcrypto for encryption
+   - Overview of Popular Extensions
+   - Installing and Using Extensions
+   - PostGIS for Spatial Data
+   - pg_stat_statements for Query Analysis
+   - pgcrypto for Encryption
 
 5. **Advisory Locks**
-   - Understanding advisory locks
-   - Application-level locking mechanisms
-   - Use cases for advisory locks
+   - Understanding Advisory Locks
+   - Application-Level Locking Mechanisms
+   - Use Cases for Advisory Locks
 
-## Examples and Exercises
+## 1. Custom Data Types
 
-### Example 1: Custom Data Types
+PostgreSQL allows you to create custom data types to model your data more precisely. These types help enforce consistency, simplify queries, and make your database schema more robust. Let’s explore the four main types of custom data types with detailed explanations and examples.
 
-#### Domain Types
+### Domain Types
 
-Domain types are essentially data types with constraints. They're useful for ensuring consistent validation across multiple tables.
+**Definition**: A domain type is a base data type (like `VARCHAR` or `NUMERIC`) with additional constraints to enforce specific rules. It ensures consistent validation across multiple tables without repeating constraints.
 
-```sql
--- Create a domain type for email addresses
-CREATE DOMAIN email_address AS VARCHAR(255)
-  CHECK (VALUE ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+**Why Use It?**
+- Enforces rules like valid email formats or positive numbers.
+- Reusable across multiple tables, reducing redundancy.
+- Simplifies schema maintenance.
 
--- Create a table using the domain
-CREATE TABLE users (
-  user_id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email email_address NOT NULL UNIQUE
-);
-
--- Insert valid and invalid data
-INSERT INTO users (name, email) VALUES ('John Doe', 'john.doe@example.com'); -- Valid
--- This will fail due to domain constraint:
--- INSERT INTO users (name, email) VALUES ('Invalid User', 'not-an-email');
-
--- Example with another domain for positive prices
-CREATE DOMAIN positive_price AS NUMERIC(10, 2)
-  CHECK (VALUE > 0);
-
-CREATE TABLE products (
-  product_id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  price positive_price NOT NULL
-);
-
--- Valid insert
-INSERT INTO products (name, price) VALUES ('Smartphone', 699.99);
--- Invalid insert (will fail)
--- INSERT INTO products (name, price) VALUES ('Free Item', 0);
--- INSERT INTO products (name, price) VALUES ('Negative Price', -10);
+**Mermaid Diagram**:
+```mermaid
+graph TD
+    A[Domain Type] --> B[Base Type: VARCHAR]
+    A --> C[Constraint: Email Regex]
+    B --> D[Table: users]
+    C --> D
+    D --> E[Column: email]
+    E --> F[Ensures valid email format]
 ```
 
-#### Composite Types
+**Examples**:
+1. **Email Address Validation**:
+   ```sql
+   -- Create a domain for valid email addresses
+   CREATE DOMAIN email_address AS VARCHAR(255)
+       CHECK (VALUE ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
-Composite types are similar to structs or records in programming languages. They allow you to define a type consisting of multiple fields.
+   -- Create a table using the domain
+   CREATE TABLE employees (
+       employee_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       email email_address NOT NULL UNIQUE
+   );
 
-```sql
--- Create a composite type for addresses
-CREATE TYPE address AS (
-  street VARCHAR(100),
-  city VARCHAR(50),
-  state CHAR(2),
-  zip VARCHAR(10)
-);
+   -- Insert valid data
+   INSERT INTO employees (name, email) VALUES ('Alice Brown', 'alice.brown@company.com');
 
--- Create a table using the composite type
-CREATE TABLE customers (
-  customer_id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  shipping_address address,
-  billing_address address
-);
+   -- Invalid insert (will fail due to domain constraint)
+   -- INSERT INTO employees (name, email) VALUES ('Bob Smith', 'invalid-email');
+   ```
 
--- Insert data with composite type
-INSERT INTO customers (name, shipping_address, billing_address)
-VALUES (
-  'Jane Smith',
-  ROW('123 Main St', 'Boston', 'MA', '02108'),
-  ROW('123 Main St', 'Boston', 'MA', '02108')
-);
+2. **Positive Integer Domain**:
+   ```sql
+   -- Create a domain for positive integers
+   CREATE DOMAIN positive_int AS INTEGER
+       CHECK (VALUE > 0);
 
--- Query with composite types
-SELECT 
-  name, 
-  (shipping_address).street AS shipping_street,
-  (shipping_address).city AS shipping_city
-FROM customers;
+   -- Create a table for product quantities
+   CREATE TABLE inventory (
+       item_id SERIAL PRIMARY KEY,
+       item_name VARCHAR(100) NOT NULL,
+       quantity positive_int NOT NULL
+   );
 
--- Update a field in a composite type
-UPDATE customers
-SET shipping_address.zip = '02109'
-WHERE customer_id = 1;
+   -- Insert valid data
+   INSERT INTO inventory (item_name, quantity) VALUES ('Laptop', 10);
+
+   -- Invalid insert (will fail)
+   -- INSERT INTO inventory (item_name, quantity) VALUES ('Tablet', -5);
+   ```
+
+3. **Percentage Domain**:
+   ```sql
+   -- Create a domain for percentages (0-100)
+   CREATE DOMAIN percentage AS NUMERIC(5,2)
+       CHECK (VALUE >= 0 AND VALUE <= 100);
+
+   -- Create a table for exam scores
+   CREATE TABLE exam_results (
+       student_id SERIAL PRIMARY KEY,
+       subject VARCHAR(50) NOT NULL,
+       score percentage NOT NULL
+   );
+
+   -- Insert valid data
+   INSERT INTO exam_results (subject, score) VALUES ('Math', 85.50);
+
+   -- Invalid insert (will fail)
+   -- INSERT INTO exam_results (subject, score) VALUES ('Science', 101);
+   ```
+
+4. **Non-Empty String Domain**:
+   ```sql
+   -- Create a domain for non-empty strings
+   CREATE DOMAIN non_empty_string AS TEXT
+       CHECK (VALUE IS NOT NULL AND VALUE <> '');
+
+   -- Create a table for categories
+   CREATE TABLE product_categories (
+       category_id SERIAL PRIMARY KEY,
+       category_name non_empty_string NOT NULL
+   );
+
+   -- Insert valid data
+   INSERT INTO product_categories (category_name) VALUES ('Electronics');
+
+   -- Invalid insert (will fail)
+   -- INSERT INTO product_categories (category_name) VALUES ('');
+   ```
+
+5. **Valid Phone Number Domain**:
+   ```sql
+   -- Create a domain for US phone numbers
+   CREATE DOMAIN us_phone AS VARCHAR(12)
+       CHECK (VALUE ~ '^\d{3}-\d{3}-\d{4}$');
+
+   -- Create a table for contacts
+   CREATE TABLE contacts (
+       contact_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       phone us_phone NOT NULL
+   );
+
+   -- Insert valid data
+   INSERT INTO contacts (name, phone) VALUES ('Charlie Davis', '123-456-7890');
+
+   -- Invalid insert (will fail)
+   -- INSERT INTO contacts (name, phone) VALUES ('Eve Garcia', '123-456-789');
+   ```
+
+### Composite Types
+
+**Definition**: Composite types allow you to group multiple fields into a single type, similar to a struct or record in programming languages. They are useful for representing complex data structures like addresses or coordinates.
+
+**Why Use It?**
+- Groups related fields together.
+- Simplifies queries and updates for complex data.
+- Improves readability and maintainability.
+
+**Mermaid Diagram**:
+```mermaid
+classDiagram
+    class address {
+        street VARCHAR(100)
+        city VARCHAR(50)
+        state CHAR(2)
+        zip VARCHAR(10)
+    }
+    class customers {
+        customer_id SERIAL
+        name VARCHAR(100)
+        shipping_address address
+        billing_address address
+    }
+    address --> customers
 ```
 
-#### Enumerated Types (ENUM)
+**Examples**:
+1. **Address Type**:
+   ```sql
+   -- Create a composite type for addresses
+   CREATE TYPE address AS (
+       street VARCHAR(100),
+       city VARCHAR(50),
+       state CHAR(2),
+       zip VARCHAR(10)
+   );
 
-ENUM types are useful when you have a fixed set of possible values.
+   -- Create a table using the composite type
+   CREATE TABLE customers (
+       customer_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       shipping_address address,
+       billing_address address
+   );
 
-```sql
--- Create an ENUM type for order status
-CREATE TYPE order_status AS ENUM (
-  'pending',
-  'processing',
-  'shipped',
-  'delivered',
-  'cancelled'
-);
+   -- Insert data
+   INSERT INTO customers (name, shipping_address, billing_address)
+   VALUES (
+       'Jane Smith',
+       ROW('123 Main St', 'Boston', 'MA', '02108'),
+       ROW('456 Oak Ave', 'Boston', 'MA', '02109')
+   );
 
--- Create a table using the ENUM
-CREATE TABLE orders (
-  order_id SERIAL PRIMARY KEY,
-  customer_id INTEGER NOT NULL,
-  order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  status order_status NOT NULL DEFAULT 'pending'
-);
+   -- Query composite fields
+   SELECT name, (shipping_address).street AS street FROM customers;
+   ```
 
--- Insert with ENUM values
-INSERT INTO orders (customer_id, status)
-VALUES 
-  (1, 'pending'),
-  (2, 'processing'),
-  (3, 'shipped'),
-  (4, 'delivered'),
-  (5, 'cancelled');
+2. **Coordinates Type**:
+   ```sql
+   -- Create a composite type for geographic coordinates
+   CREATE TYPE coordinates AS (
+       latitude NUMERIC(9,6),
+       longitude NUMERIC(9,6)
+   );
 
--- Invalid ENUM value (will fail)
--- INSERT INTO orders (customer_id, status) VALUES (6, 'refunded');
+   -- Create a table for locations
+   CREATE TABLE points_of_interest (
+       poi_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       location coordinates
+   );
 
--- Query with ENUM values
-SELECT * FROM orders WHERE status = 'shipped';
+   -- Insert data
+   INSERT INTO points_of_interest (name, location)
+   VALUES ('Central Park', ROW(40.7829, -73.9654));
 
--- Sort by ENUM order (ENUMs are ordered by their creation position)
-SELECT * FROM orders ORDER BY status;
+   -- Query coordinates
+   SELECT name, (location).latitude AS lat FROM points_of_interest;
+   ```
 
--- Add a new value to an existing ENUM (adding at the end)
-ALTER TYPE order_status ADD VALUE 'refunded' AFTER 'cancelled';
+3. **Person Info Type**:
+   ```sql
+   -- Create a composite type for person details
+   CREATE TYPE person_info AS (
+       first_name VARCHAR(50),
+       last_name VARCHAR(50),
+       date_of_birth DATE
+   );
+
+   -- Create a table for employees
+   CREATE TABLE employees (
+       emp_id SERIAL PRIMARY KEY,
+       info person_info
+   );
+
+   -- Insert data
+   INSERT INTO employees (info)
+   VALUES (ROW('John', 'Doe', '1980-01-15'));
+
+   -- Query specific fields
+   SELECT (info).first_name AS first_name FROM employees;
+   ```
+
+4. **Contact Info Type**:
+   ```sql
+   -- Create a composite type for contact details
+   CREATE TYPE contact_info AS (
+       email VARCHAR(255),
+       phone VARCHAR(12)
+   );
+
+   -- Create a table for vendors
+   CREATE TABLE vendors (
+       vendor_id SERIAL PRIMARY KEY,
+       vendor_name VARCHAR(100) NOT NULL,
+       contact contact_info
+   );
+
+   -- Insert data
+   INSERT INTO vendors (vendor_name, contact)
+   VALUES ('Tech Supplies', ROW('contact@techsupplies.com', '555-123-4567'));
+
+   -- Update a field
+   UPDATE vendors SET contact.phone = '555-987-6543' WHERE vendor moderator_id = 1;
+   ```
+
+5. **Product Specs Type**:
+   ```sql
+   -- Create a composite type for product specifications
+   CREATE TYPE product_specs AS (
+       weight NUMERIC(6,2),
+       dimensions VARCHAR(50),
+       color VARCHAR(20)
+   );
+
+   -- Create a table for products
+   CREATE TABLE products (
+       product_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       specs product_specs
+   );
+
+   -- Insert data
+   INSERT INTO products (name, specs)
+   VALUES ('Smartphone', ROW(0.15, '140x70x7 mm', 'Black'));
+
+   -- Query specific specs
+   SELECT name, (specs).color AS color FROM products;
+   ```
+
+### Enumerated Types (ENUM)
+
+**Definition**: ENUM types define a fixed set of values, ideal for columns that can only have specific states, like order statuses or categories.
+
+**Why Use It?**
+- Restricts values to a predefined list.
+- Improves data integrity and query simplicity.
+- Ordered by creation sequence, useful for sorting.
+
+**Mermaid Diagram**:
+```mermaid
+graph TD
+    A[ENUM Type: order_status] --> B[Values: pending, processing, shipped, delivered, cancelled]
+    B --> C[Table: orders]
+    C --> D[Column: status]
+    D --> E[Restricts to valid statuses]
 ```
 
-#### Range Types
+**Examples**:
+1. **Order Status ENUM**:
+   ```sql
+   -- Create an ENUM type for order status
+   CREATE TYPE order_status AS ENUM ('pending', 'processing', 'shipped', 'delivered', 'cancelled');
 
-Range types represent a range of values, such as a date range or a numeric range.
+   -- Create a table
+   CREATE TABLE orders (
+       order_id SERIAL PRIMARY KEY,
+       customer_id INTEGER NOT NULL,
+       status order_status NOT NULL DEFAULT 'pending'
+   );
 
-```sql
--- Create a table using built-in range types
-CREATE TABLE reservations (
-  reservation_id SERIAL PRIMARY KEY,
-  room_id INTEGER NOT NULL,
-  reserved_during DATERANGE NOT NULL,
-  price_per_night NUMRANGE NOT NULL
-);
+   -- Insert data
+   INSERT INTO orders (customer_id, status) VALUES (1, 'shipped');
 
--- Insert ranges
-INSERT INTO reservations (room_id, reserved_during, price_per_night)
-VALUES
-  (101, '[2023-01-10, 2023-01-15)', '[100, 150)'),
-  (102, '[2023-01-12, 2023-01-20)', '[120, 180)'),
-  (103, '[2023-02-01, 2023-02-05)', '[90, 130)');
+   -- Query by status
+   SELECT * FROM orders WHERE status = 'shipped';
+   ```
 
--- Query using range operators
--- Find reservations that include January 13th
-SELECT * 
-FROM reservations 
-WHERE reserved_during @> '2023-01-13'::DATE;
+2. **Priority Levels ENUM**:
+   ```sql
+   -- Create an ENUM type for task priorities
+   CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high', 'urgent');
 
--- Find reservations that overlap with a specific period
-SELECT * 
-FROM reservations 
-WHERE reserved_during && '[2023-01-14, 2023-01-25)'::DATERANGE;
+   -- Create a table for tasks
+   CREATE TABLE tasks (
+       task_id SERIAL PRIMARY KEY,
+       description TEXT NOT NULL,
+       priority task_priority NOT NULL
+   );
 
--- Find rooms with a price range that contains 125
-SELECT * 
-FROM reservations 
-WHERE price_per_night @> 125;
+   -- Insert data
+   INSERT INTO tasks (description, priority) VALUES ('Fix bug', 'high');
 
--- Creating a custom range type
-CREATE TYPE temperature_range AS RANGE (
-  SUBTYPE = NUMERIC
-);
+   -- Query high-priority tasks
+   SELECT * FROM tasks WHERE priority = 'high';
+   ```
 
-CREATE TABLE climate_readings (
-  reading_id SERIAL PRIMARY KEY,
-  location VARCHAR(100) NOT NULL,
-  reading_date DATE NOT NULL,
-  temperature temperature_range NOT NULL
-);
+3. **Payment Status ENUM**:
+   ```sql
+   -- Create an ENUM type for payment status
+   CREATE TYPE payment_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
 
-INSERT INTO climate_readings (location, reading_date, temperature)
-VALUES 
-  ('Boston', '2023-01-15', '[28, 35]'),
-  ('Miami', '2023-01-15', '[65, 78]');
+   -- Create a table for payments
+   CREATE TABLE payments (
+       payment_id SERIAL PRIMARY KEY,
+       amount NUMERIC(10,2) NOT NULL,
+       status payment_status NOT NULL
+   );
+
+   -- Insert data
+   INSERT INTO payments (amount, status) VALUES (99.99, 'completed');
+
+   -- Query completed payments
+   SELECT * FROM payments WHERE status = 'completed';
+   ```
+
+4. **User Roles ENUM**:
+   ```sql
+   -- Create an ENUM type for user roles
+   CREATE TYPE user_role AS ENUM ('admin', 'editor', 'viewer');
+
+   -- Create a table for users
+   CREATE TABLE users (
+       user_id SERIAL PRIMARY KEY,
+       username VARCHAR(50) NOT NULL,
+       role user_role NOT NULL
+   );
+
+   -- Insert data
+   INSERT INTO users (username, role) VALUES ('alice', 'admin');
+
+   -- Query admins
+   SELECT * FROM users WHERE role = 'admin';
+   ```
+
+5. **Product Categories ENUM**:
+   ```sql
+   -- Create an ENUM type for product categories
+   CREATE TYPE product_category AS ENUM ('electronics', 'clothing', 'books', 'home');
+
+   -- Create a table for products
+   CREATE TABLE products (
+       product_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       category product_category NOT NULL
+   );
+
+   -- Insert data
+   INSERT INTO products (name, category) VALUES ('Laptop', 'electronics');
+
+   -- Add a new ENUM value
+   ALTER TYPE product_category ADD VALUE 'toys' AFTER 'home';
+
+   -- Query electronics
+   SELECT * FROM products WHERE category = 'electronics';
+   ```
+
+### Range Types
+
+**Definition**: Range types represent a range of values, such as dates or numbers, allowing efficient range-based queries.
+
+**Why Use It?**
+- Simplifies queries involving intervals (e.g., date ranges).
+- Supports range operators like overlap (`&&`), contains (`@>`), etc.
+- Ideal for scheduling or resource allocation.
+
+**Mermaid Diagram**:
+```mermaid
+graph TD
+    A[Range Type: DATERANGE] --> B[Table: reservations]
+    B --> C[Column: reserved_during]
+    C --> D[Supports range queries like @> or &&]
 ```
 
-### Example 2: Table Inheritance
+**Examples**:
+1. **Date Range for Reservations**:
+   ```sql
+   -- Create a table with a date range
+   CREATE TABLE hotel_bookings (
+       booking_id SERIAL PRIMARY KEY,
+       room_id INTEGER NOT NULL,
+       reserved_during DATERANGE NOT NULL
+   );
 
-Table inheritance allows you to create parent-child table relationships where child tables inherit columns from parent tables.
+   -- Insert data
+   INSERT INTO hotel_bookings (room_id, reserved_during)
+   VALUES (101, '[2023-01-10, 2023-01-15)');
 
-```sql
--- Create a parent table
-CREATE TABLE vehicles (
-  vehicle_id SERIAL PRIMARY KEY,
-  manufacturer VARCHAR(100) NOT NULL,
-  model VARCHAR(100) NOT NULL,
-  year INTEGER NOT NULL,
-  price NUMERIC(10, 2) NOT NULL
-);
+   -- Query bookings for a specific date
+   SELECT * FROM hotel_bookings WHERE reserved_during @> '2023-01-12'::DATE;
+   ```
 
--- Create child tables that inherit from vehicles
-CREATE TABLE cars (
-  num_doors INTEGER NOT NULL,
-  body_style VARCHAR(50) NOT NULL,
-  transmission VARCHAR(20) NOT NULL
-) INHERITS (vehicles);
+2. **Numeric Range for Prices**:
+   ```sql
+   -- Create a table with a numeric range
+   CREATE TABLE product_prices (
+       product_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       price_range NUMRANGE NOT NULL
+   );
 
-CREATE TABLE trucks (
-  payload_capacity NUMERIC(10, 2) NOT NULL,
-  bed_length NUMERIC(5, 2) NOT NULL,
-  towing_capacity NUMERIC(10, 2) NOT NULL
-) INHERITS (vehicles);
+   -- Insert data
+   INSERT INTO product_prices (name, price_range)
+   VALUES ('Smartphone', '[500, 700)');
 
-CREATE TABLE motorcycles (
-  engine_displacement INTEGER NOT NULL,
-  has_sidecar BOOLEAN NOT NULL DEFAULT FALSE
-) INHERITS (vehicles);
+   -- Query products in a price range
+   SELECT * FROM product_prices WHERE price_range @> 600;
+   ```
 
--- Insert data into the tables
--- Cars
-INSERT INTO cars (manufacturer, model, year, price, num_doors, body_style, transmission)
-VALUES 
-  ('Toyota', 'Camry', 2022, 25000.00, 4, 'Sedan', 'Automatic'),
-  ('Honda', 'Civic', 2021, 22000.00, 4, 'Sedan', 'CVT'),
-  ('Ford', 'Mustang', 2023, 45000.00, 2, 'Coupe', 'Manual');
+3. **Custom Temperature Range**:
+   ```sql
+   -- Create a custom range type
+   CREATE TYPE temperature_range AS RANGE (SUBTYPE = NUMERIC);
 
--- Trucks
-INSERT INTO trucks (manufacturer, model, year, price, payload_capacity, bed_length, towing_capacity)
-VALUES 
-  ('Ford', 'F-150', 2022, 35000.00, 2000.00, 6.5, 10000.00),
-  ('Chevrolet', 'Silverado', 2022, 38000.00, 2200.00, 5.8, 12000.00);
+   -- Create a table for climate data
+   CREATE TABLE climate_data (
+       reading_id SERIAL PRIMARY KEY,
+       location VARCHAR(100) NOT NULL,
+       temp_range temperature_range NOT NULL
+   );
 
--- Motorcycles
-INSERT INTO motorcycles (manufacturer, model, year, price, engine_displacement, has_sidecar)
-VALUES 
-  ('Harley-Davidson', 'Street Glide', 2021, 22000.00, 1868, FALSE),
-  ('BMW', 'R1250GS', 2022, 18000.00, 1254, FALSE),
-  ('Ural', 'Gear Up', 2020, 16000.00, 749, TRUE);
+   -- Insert data
+   INSERT INTO climate_data (location, temp_range)
+   VALUES ('Miami', '[20, 30]');
 
--- Query all vehicles (includes all child tables)
-SELECT * FROM vehicles;
+   -- Query temperature ranges
+   SELECT * FROM climate_data WHERE temp_range && '[25, 35]';
+   ```
 
--- Query only specific vehicle types
-SELECT * FROM ONLY vehicles; -- Only records directly in the vehicles table (none in this case)
-SELECT * FROM cars;
-SELECT * FROM trucks;
-SELECT * FROM motorcycles;
+4. **Event Time Range**:
+   ```sql
+   -- Create a table for events
+   CREATE TABLE events (
+       event_id SERIAL PRIMARY KEY,
+       event_name VARCHAR(100) NOT NULL,
+       duration TSTZRANGE NOT NULL
+   );
 
--- Query with TABLEOID to see which table each record comes from
-SELECT 
-  tableoid::regclass AS table_name,
-  vehicle_id,
-  manufacturer,
-  model
-FROM vehicles;
+   -- Insert data
+   INSERT INTO events (event_name, duration)
+   VALUES ('Conference', '[2023-06-01 09:00, 2023-06-01 17:00)');
 
--- Join with child-specific columns
-SELECT 
-  v.vehicle_id,
-  v.manufacturer,
-  v.model,
-  v.year,
-  v.price,
-  c.num_doors,
-  c.body_style
-FROM vehicles v
-JOIN cars c ON v.vehicle_id = c.vehicle_id
-WHERE v.price < 30000.00;
+   -- Query overlapping events
+   SELECT * FROM events WHERE duration && '[2023-06-01 12:00, 2023-06-01 14:00)';
+   ```
+
+5. **Inventory Stock Range**:
+   ```sql
+   -- Create a table for inventory
+   CREATE TABLE inventory (
+       item_id SERIAL PRIMARY KEY,
+       item_name VARCHAR(100) NOT NULL,
+       stock_range INTRANGE NOT NULL
+   );
+
+   -- Insert data
+   INSERT INTO inventory (item_name, stock_range)
+   VALUES ('Laptop', '[10, 50)');
+
+   -- Query items with stock in range
+   SELECT * FROM inventory WHERE stock_range @> 25;
+   ```
+
+## 2. Inheritance
+
+**Definition**: Table inheritance allows child tables to inherit columns from a parent table, modeling "is-a" relationships (e.g., a car is a vehicle).
+
+**Why Use It?**
+- Organizes related tables hierarchically.
+- Simplifies queries across related tables.
+- Useful for modeling object-oriented-like structures.
+
+**Limitations**:
+- Constraints on parent tables don’t apply to child tables.
+- Not ideal for performance optimization (use partitioning instead).
+
+**Mermaid Diagram**:
+```mermaid
+classDiagram
+    class vehicles {
+        vehicle_id SERIAL
+        manufacturer VARCHAR
+        model VARCHAR
+        year INTEGER
+        price NUMERIC
+    }
+    class cars {
+        num_doors INTEGER
+        body_style VARCHAR
+        transmission VARCHAR
+    }
+    class trucks {
+        payload_capacity NUMERIC
+        bed_length NUMERIC
+        towing_capacity NUMERIC
+    }
+    vehicles <|-- cars
+    vehicles <|-- trucks
 ```
 
-### Example 3: Table Partitioning
+**Examples**:
+1. **Vehicle Inheritance**:
+   ```sql
+   -- Create parent table
+   CREATE TABLE vehicles (
+       vehicle_id SERIAL PRIMARY KEY,
+       manufacturer VARCHAR(100) NOT NULL,
+       model VARCHAR(100) NOT NULL,
+       year INTEGER NOT NULL
+   );
 
-Partitioning divides large tables into smaller, more manageable pieces while maintaining the appearance of a single table.
+   -- Create child table
+   CREATE TABLE cars (
+       num_doors INTEGER NOT NULL
+   ) INHERITS (vehicles);
 
-```sql
--- Range Partitioning Example
--- Create a partitioned table for sales data
-CREATE TABLE sales (
-    sale_id SERIAL,
-    product_id INTEGER NOT NULL,
-    sale_date DATE NOT NULL,
-    amount NUMERIC(10, 2) NOT NULL,
-    customer_id INTEGER NOT NULL,
-    PRIMARY KEY (sale_id, sale_date)
-) PARTITION BY RANGE (sale_date);
+   -- Insert data
+   INSERT INTO cars (manufacturer, model, year, num_doors)
+   VALUES ('Toyota', 'Camry', 2022, 4);
 
--- Create partitions for different date ranges
-CREATE TABLE sales_2021 PARTITION OF sales
-    FOR VALUES FROM ('2021-01-01') TO ('2022-01-01');
+   -- Query all vehicles
+   SELECT * FROM vehicles;
+   ```
 
-CREATE TABLE sales_2022 PARTITION OF sales
-    FOR VALUES FROM ('2022-01-01') TO ('2023-01-01');
+2. **Employee Types**:
+   ```sql
+   -- Create parent table
+   CREATE TABLE employees (
+       emp_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       hire_date DATE NOT NULL
+   );
 
-CREATE TABLE sales_2023 PARTITION OF sales
-    FOR VALUES FROM ('2023-01-01') TO ('2024-01-01');
+   -- Create child table
+   CREATE TABLE managers (
+       department VARCHAR(50) NOT NULL
+   ) INHERITS (employees);
 
--- Insert data into the partitioned table
-INSERT INTO sales (product_id, sale_date, amount, customer_id)
-VALUES
-    (101, '2021-05-10', 250.00, 1001),
-    (102, '2021-11-20', 125.50, 1002),
-    (103, '2022-02-15', 340.00, 1003),
-    (104, '2022-07-05', 190.75, 1004),
-    (105, '2023-01-25', 460.25, 1005),
-    (106, '2023-03-14', 275.00, 1006);
+   -- Insert data
+   INSERT INTO managers (name, hire_date, department)
+   VALUES ('Alice', '2020-01-10', 'Sales');
 
--- View partitions
-SELECT 
-    tableoid::regclass AS partition_name,
-    count(*) AS row_count
-FROM 
-    sales
-GROUP BY 
-    tableoid;
+   -- Query all employees
+   SELECT * FROM employees;
+   ```
 
--- Query the entire table (PostgreSQL will use partition pruning)
-EXPLAIN ANALYZE
-SELECT * FROM sales WHERE sale_date BETWEEN '2022-01-01' AND '2022-12-31';
+3. **Products Inheritance**:
+   ```sql
+   -- Create parent table
+   CREATE TABLE products (
+       product_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       price NUMERIC(10,2) NOT NULL
+   );
 
--- List Partitioning Example
--- Create a partitioned table for regional customer data
-CREATE TABLE customers (
-    customer_id SERIAL,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    region VARCHAR(2) NOT NULL,
-    join_date DATE NOT NULL,
-    PRIMARY KEY (customer_id, region)
-) PARTITION BY LIST (region);
+   -- Create child table
+   CREATE TABLE electronics (
+       warranty_years INTEGER NOT NULL
+   ) INHERITS (products);
 
--- Create partitions for different regions
-CREATE TABLE customers_east PARTITION OF customers
-    FOR VALUES IN ('EA', 'NE');
+   -- Insert data
+   INSERT INTO electronics (name, price, warranty_years)
+   VALUES ('Laptop', 999.99, 2);
 
-CREATE TABLE customers_west PARTITION OF customers
-    FOR VALUES IN ('WE', 'NW');
+   -- Query with TABLEOID
+   SELECT tableoid::regclass, name FROM products;
+   ```
 
-CREATE TABLE customers_south PARTITION OF customers
-    FOR VALUES IN ('SE', 'SW');
+4. **Accounts Inheritance**:
+   ```sql
+   -- Create parent table
+   CREATE TABLE accounts (
+       account_id SERIAL PRIMARY KEY,
+       username VARCHAR(50) NOT NULL
+   );
 
--- Insert data into different partitions
-INSERT INTO customers (name, email, region, join_date)
-VALUES
-    ('John Smith', 'john@example.com', 'EA', '2021-05-10'),
-    ('Jane Doe', 'jane@example.com', 'WE', '2021-06-15'),
-    ('Bob Johnson', 'bob@example.com', 'SE', '2022-01-05'),
-    ('Alice Brown', 'alice@example.com', 'NE', '2022-03-20'),
-    ('Charlie Davis', 'charlie@example.com', 'NW', '2022-07-30'),
-    ('Eva Garcia', 'eva@example.com', 'SW', '2023-02-12');
+   -- Create child table
+   CREATE TABLE premium_accounts (
+       subscription_type VARCHAR(20) NOT NULL
+   ) INHERITS (accounts);
 
--- View partitions
-SELECT 
-    tableoid::regclass AS partition_name,
-    count(*) AS row_count
-FROM 
-    customers
-GROUP BY 
-    tableoid;
+   -- Insert data
+   INSERT INTO premium_accounts (username, subscription_type)
+   VALUES ('john_doe', 'Gold');
 
--- Hash Partitioning Example
--- Create a partitioned table for product reviews
-CREATE TABLE product_reviews (
-    review_id SERIAL,
-    product_id INTEGER NOT NULL,
-    customer_id INTEGER NOT NULL,
-    rating INTEGER NOT NULL,
-    review_date DATE NOT NULL,
-    comment TEXT,
-    PRIMARY KEY (review_id, product_id)
-) PARTITION BY HASH (product_id);
+   -- Query specific child table
+   SELECT * FROM premium_accounts;
+   ```
 
--- Create 4 hash partitions
-CREATE TABLE product_reviews_p0 PARTITION OF product_reviews
-    FOR VALUES WITH (MODULUS 4, REMAINDER 0);
+5. **Assets Inheritance**:
+   ```sql
+   -- Create parent table
+   CREATE TABLE assets (
+       asset_id SERIAL PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       value NUMERIC(10,2) NOT NULL
+   );
 
-CREATE TABLE product_reviews_p1 PARTITION OF product_reviews
-    FOR VALUES WITH (MODULUS 4, REMAINDER 1);
+   -- Create child table
+   CREATE TABLE real_estate (
+       address VARCHAR(200) NOT NULL
+   ) INHERITS (assets);
 
-CREATE TABLE product_reviews_p2 PARTITION OF product_reviews
-    FOR VALUES WITH (MODULUS 4, REMAINDER 2);
+   -- Insert data
+   INSERT INTO real_estate (name, value, address)
+   VALUES ('Office Building', 500000.00, '123 Main St');
 
-CREATE TABLE product_reviews_p3 PARTITION OF product_reviews
-    FOR VALUES WITH (MODULUS 4, REMAINDER 3);
+   -- Join with parent
+   SELECT a.name, r.address FROM assets a JOIN real_estate r ON a.asset_id = r.asset_id;
+   ```
 
--- Insert some sample data
-INSERT INTO product_reviews (product_id, customer_id, rating, review_date, comment)
-VALUES
-    (101, 1001, 5, '2023-01-10', 'Excellent product!'),
-    (102, 1002, 4, '2023-01-15', 'Very good, but could be better.'),
-    (103, 1003, 5, '2023-01-20', 'Absolutely love it!'),
-    (104, 1004, 3, '2023-01-25', 'It''s okay, but overpriced.'),
-    (105, 1005, 4, '2023-02-01', 'Good quality for the price.'),
-    (106, 1006, 2, '2023-02-05', 'Disappointed with durability.'),
-    (107, 1007, 5, '2023-02-10', 'Perfect for my needs!'),
-    (108, 1008, 4, '2023-02-15', 'Works as advertised.');
+## 3. Partitioning
 
--- View partitions
-SELECT 
-    tableoid::regclass AS partition_name,
-    count(*) AS row_count
-FROM 
-    product_reviews
-GROUP BY 
-    tableoid;
+**Definition**: Partitioning splits a large table into smaller, manageable pieces (partitions) based on a key, improving query performance.
 
--- Managing Partitions
--- Add a new partition for sales in 2024
-CREATE TABLE sales_2024 PARTITION OF sales
-    FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
+**Why Use It?**
+- Enhances query performance through partition pruning.
+- Simplifies maintenance of large datasets.
+- Supports range, list, and hash partitioning strategies.
 
--- Detach a partition (without removing the data)
-ALTER TABLE sales DETACH PARTITION sales_2021;
-
--- Attach an existing table as a partition
-ALTER TABLE sales ATTACH PARTITION sales_2021
-    FOR VALUES FROM ('2021-01-01') TO ('2022-01-01');
-
--- Creating a default partition for values that don't match other partitions
-CREATE TABLE sales_default PARTITION OF sales DEFAULT;
-
--- Insert data that doesn't match any explicit partition range
-INSERT INTO sales (product_id, sale_date, amount, customer_id)
-VALUES (107, '2025-01-15', 550.00, 1007);
-
--- Verify it went to the default partition
-SELECT 
-    tableoid::regclass AS partition_name,
-    *
-FROM 
-    sales
-WHERE 
-    sale_date >= '2025-01-01';
+**Mermaid Diagram**:
+```mermaid
+graph TD
+    A[Table: sales] --> B[Partitioned by: sale_date]
+    B --> C[Partition: sales_2021]
+    B --> D[Partition: sales_2022]
+    B --> E[Partition: sales_2023]
+    A --> F[Query with partition pruning]
 ```
 
-### Example 4: PostgreSQL Extensions
+**Examples**:
+1. **Range Partitioning (Sales by Year)**:
+   ```sql
+   -- Create partitioned table
+   CREATE TABLE sales (
+       sale_id SERIAL,
+       sale_date DATE NOT NULL,
+       amount NUMERIC(10,2) NOT NULL,
+       PRIMARY KEY (sale_id, sale_date)
+   ) PARTITION BY RANGE (sale_date);
 
-Extensions provide additional functionality to PostgreSQL.
+   -- Create partitions
+   CREATE TABLE sales_2021 PARTITION OF sales
+       FOR VALUES FROM ('2021-01-01') TO ('2022-01-01');
 
-```sql
--- List available extensions
-SELECT * FROM pg_available_extensions;
+   -- Insert data
+   INSERT INTO sales (sale_date, amount) VALUES ('2021-06-15', 200.00);
 
--- List installed extensions
-SELECT * FROM pg_extension;
+   -- Query with partition pruning
+   SELECT * FROM sales WHERE sale_date = '2021-06-15';
+   ```
 
--- Installing the pgcrypto extension for encryption functions
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+2. **List Partitioning (Customers by Region)**:
+   ```sql
+   -- Create partitioned table
+   CREATE TABLE customers (
+       customer_id SERIAL,
+       region VARCHAR(2) NOT NULL,
+       name VARCHAR(100) NOT NULL,
+       PRIMARY KEY (customer_id, region)
+   ) PARTITION BY LIST (region);
 
--- Using pgcrypto functions
-SELECT gen_random_uuid() AS random_uuid;
+   -- Create partitions
+   CREATE TABLE customers_east PARTITION OF customers FOR VALUES IN ('EA');
 
--- Hash a password with pgcrypto
-SELECT crypt('mysecretpassword', gen_salt('bf'));
+   -- Insert data
+   INSERT INTO customers (region, name) VALUES ('EA', 'John');
 
--- Verify a password hash
-SELECT 
-    crypt('mysecretpassword', '$2a$06$3BVJRQt3HCMCwR4y1uFpO.xwZKjRk9MTL9MKPwkqICwGrHDGOsQOu') = 
-    '$2a$06$3BVJRQt3HCMCwR4y1uFpO.xwZKjRk9MTL9MKPwkqICwGrHDGOsQOu' 
-    AS password_matches;
+   -- Query specific region
+   SELECT * FROM customers WHERE region = 'EA';
+   ```
 
--- Installing the pg_stat_statements extension for query analysis
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+3. **Hash Partitioning (Reviews by Product)**:
+   ```sql
+   -- Create partitioned table
+   CREATE TABLE product_reviews (
+       review_id SERIAL,
+       product_id INTEGER NOT NULL,
+       rating INTEGER NOT NULL,
+       PRIMARY KEY (review_id, product_id)
+   ) PARTITION BY HASH (product_id);
 
--- View query statistics (after some queries have been run)
-SELECT 
-    query,
-    calls,
-    total_exec_time,
-    mean_exec_time,
-    rows
-FROM 
-    pg_stat_statements
-ORDER BY 
-    total_exec_time DESC
-LIMIT 10;
+   -- Create partitions
+   CREATE TABLE reviews_p0 PARTITION OF product_reviews FOR VALUES WITH (MODULUS 2, REMAINDER 0);
 
--- Reset the statistics
-SELECT pg_stat_statements_reset();
+   -- Insert data
+   INSERT INTO product_reviews (product_id, rating) VALUES (101, 5);
 
--- Uninstalling an extension
-DROP EXTENSION IF EXISTS pg_stat_statements;
+   -- View partition distribution
+   SELECT tableoid::regclass, count(*) FROM product_reviews GROUP BY tableoid;
+   ```
 
--- Basic example of PostGIS (spatial extension)
--- Note: This is a simplified example, actual installation may require additional steps
--- CREATE EXTENSION IF NOT EXISTS postgis;
+4. **Default Partition**:
+   ```sql
+   -- Create partitioned table
+   CREATE TABLE orders (
+       order_id SERIAL,
+       order_date DATE NOT NULL,
+       amount NUMERIC(10,2) NOT NULL,
+       PRIMARY KEY (order_id, order_date)
+   ) PARTITION BY RANGE (order_date);
 
--- Creating a spatial table (if PostGIS is installed)
--- CREATE TABLE locations (
---     id SERIAL PRIMARY KEY,
---     name VARCHAR(100) NOT NULL,
---     location GEOMETRY(Point, 4326)
--- );
+   -- Create partitions
+   CREATE TABLE orders_2023 PARTITION OF orders
+       FOR VALUES FROM ('2023-01-01') TO ('2024-01-01');
+   CREATE TABLE orders_default PARTITION OF orders DEFAULT;
 
--- Insert a point (longitude, latitude)
--- INSERT INTO locations (name, location)
--- VALUES ('PostgreSQL HQ', ST_SetSRID(ST_MakePoint(-122.0816, 37.3908), 4326));
+   -- Insert data
+   INSERT INTO orders (order_date, amount) VALUES ('2025-01-01', 300.00);
 
--- Calculating distance between points
--- SELECT 
---     a.name AS location1,
---     b.name AS location2,
---     ST_Distance(
---         a.location::geography,
---         b.location::geography
---     ) / 1000 AS distance_km
--- FROM 
---     locations a,
---     locations b
--- WHERE 
---     a.id < b.id;
+   -- Query default partition
+   SELECT * FROM orders_default;
+   ```
 
--- Installing hstore for key-value data
-CREATE EXTENSION IF NOT EXISTS hstore;
+5. **Managing Partitions**:
+   ```sql
+   -- Create partitioned table
+   CREATE TABLE logs (
+       log_id SERIAL,
+       log_date DATE NOT NULL,
+       message TEXT,
+       PRIMARY KEY (log_id, log_date)
+   ) PARTITION BY RANGE (log_date);
 
--- Using hstore
-CREATE TABLE products_with_attributes (
-    product_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    attributes hstore
-);
+   -- Create partitions
+   CREATE TABLE logs_2022 PARTITION OF logs
+       FOR VALUES FROM ('2022-01-01') TO ('2023-01-01');
 
-INSERT INTO products_with_attributes (name, attributes)
-VALUES 
-    ('Smartphone', 'color => "black", memory => "128GB", camera => "48MP"'),
-    ('Laptop', 'color => "silver", cpu => "i7", ram => "16GB", storage => "512GB"');
+   -- Detach and reattach partition
+   ALTER TABLE logs DETACH PARTITION logs_2022;
+   ALTER TABLE logs ATTACH PARTITION logs_2022
+       FOR VALUES FROM ('2022-01-01') TO ('2023-01-01');
 
--- Query with hstore
-SELECT 
-    name,
-    attributes -> 'color' AS color,
-    attributes -> 'memory' AS memory
-FROM 
-    products_with_attributes;
+   -- Insert and query
+   INSERT INTO logs (log_date, message) VALUES ('2022-05-10', 'Error occurred');
+   SELECT * FROM logs WHERE log_date = '2022-05-10';
+   ```
 
--- Find products with specific attributes
-SELECT * 
-FROM products_with_attributes 
-WHERE attributes @> 'color => "silver"';
+## 4. Extensions
+
+**Definition**: Extensions add specialized functionality to PostgreSQL, such as encryption, spatial data support, or query analysis.
+
+**Why Use It?**
+- Extends PostgreSQL’s capabilities without modifying core code.
+- Simplifies complex tasks like geospatial queries or encryption.
+- Well-tested extensions are maintained by the community.
+
+**Mermaid Diagram**:
+```mermaid
+graph TD
+    A[PostgreSQL Core] --> B[Extension: pgcrypto]
+    A --> C[Extension: PostGIS]
+    A --> D[Extension: pg_stat_statements]
+    B --> E[Encryption Functions]
+    C --> F[Spatial Queries]
+    D --> G[Query Performance Analysis]
 ```
 
-### Example 5: Advisory Locks
+**Examples**:
+1. **pgcrypto for Password Hashing**:
+   ```sql
+   -- Install pgcrypto
+   CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-Advisory locks provide a mechanism for applications to coordinate their activities.
+   -- Hash a password
+   SELECT crypt('password123', gen_salt('bf')) AS hashed_password;
+   ```
 
-```sql
--- Acquire an advisory lock (exclusive)
-SELECT pg_advisory_lock(100);
+2. **pg_stat_statements for Query Analysis**:
+   ```sql
+   -- Install pg_stat_statements
+   CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
--- Try to acquire the same lock (this will block until the first lock is released)
--- In another session: SELECT pg_advisory_lock(100);
+   -- View query performance
+   SELECT query, total_exec_time FROM pg_stat_statements LIMIT 5;
+   ```
 
--- Release the lock
-SELECT pg_advisory_unlock(100);
+3. **hstore for Key-Value Storage**:
+   ```sql
+   -- Install hstore
+   CREATE EXTENSION IF NOT EXISTS hstore;
 
--- Try a non-blocking lock acquisition
-SELECT pg_try_advisory_lock(101) AS lock_acquired;
+   -- Create table with hstore
+   CREATE TABLE items (
+       item_id SERIAL PRIMARY KEY,
+       attributes hstore
+   );
 
--- Using locks with multiple keys
-SELECT pg_advisory_lock(1, 2);  -- Two-key version
-SELECT pg_advisory_unlock(1, 2);
+   -- Insert data
+   INSERT INTO items (attributes)
+   VALUES ('color => "blue", size => "large"');
 
--- Session-level locks (automatically released at end of session)
-SELECT pg_advisory_lock_shared(102);  -- Shared lock
-SELECT pg_advisory_unlock_shared(102);
+   -- Query attributes
+   SELECT attributes -> 'color' AS color FROM items;
+   ```
 
--- Transaction-level locks (automatically released at end of transaction)
-BEGIN;
-SELECT pg_advisory_xact_lock(103);
--- Do some work that requires coordination
-COMMIT;  -- Lock is automatically released
+4. **uuid-ossp for UUID Generation**:
+   ```sql
+   -- Install uuid-ossp
+   CREATE EXTENSION IF NOT EXISTS uuid_ossp;
 
--- Example of application-level locking
--- Function to safely increment a counter
-CREATE OR REPLACE FUNCTION safe_increment_counter(counter_name TEXT)
-RETURNS INTEGER AS $$
-DECLARE
-    counter_id INTEGER;
-    current_value INTEGER;
-BEGIN
-    -- Get or create counter ID
-    SELECT id INTO counter_id FROM counters WHERE name = counter_name;
-    
-    IF NOT FOUND THEN
-        INSERT INTO counters (name, value) VALUES (counter_name, 0) RETURNING id INTO counter_id;
-    END IF;
-    
-    -- Acquire lock for this counter
-    PERFORM pg_advisory_lock(counter_id);
-    
-    -- Get current value
-    SELECT value INTO current_value FROM counters WHERE id = counter_id;
-    
-    -- Increment
-    UPDATE counters SET value = value + 1 WHERE id = counter_id;
-    
-    -- Release lock
-    PERFORM pg_advisory_unlock(counter_id);
-    
-    RETURN current_value + 1;
-END;
-$$ LANGUAGE plpgsql;
+   -- Generate a UUID
+   SELECT uuid_generate_v4() AS unique_id;
+   ```
 
--- Create counters table
-CREATE TABLE IF NOT EXISTS counters (
-    id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL,
-    value INTEGER NOT NULL DEFAULT 0
-);
+5. **PostGIS for Spatial Data** (Note: Requires additional setup):
+   ```sql
+   -- Install PostGIS (simplified example)
+   -- CREATE EXTENSION IF NOT EXISTS postgis;
 
--- Use the function
-SELECT safe_increment_counter('visitors');
-SELECT safe_increment_counter('visitors');
-SELECT safe_increment_counter('visitors');
+   -- Create spatial table
+   -- CREATE TABLE cities (
+   --     city_id SERIAL PRIMARY KEY,
+   --     name VARCHAR(100),
+   --     location GEOMETRY(Point, 4326)
+   -- );
+
+   -- Insert data
+   -- INSERT INTO cities (name, location)
+   -- VALUES ('New York', ST_SetSRID(ST_MakePoint(-74.0060, 40.7128), 4326));
+   ```
+
+## 5. Advisory Locks
+
+**Definition**: Advisory locks provide application-level locking mechanisms to coordinate activities across sessions, independent of table rows.
+
+**Why Use It?**
+- Prevents conflicts in application logic (e.g., unique counter increments).
+- Flexible with session or transaction-level locks.
+- Lightweight compared to row-level locks.
+
+**Mermaid Diagram**:
+```mermaid
+sequenceDiagram
+    participant Session1
+    participant Session2
+    participant PostgreSQL
+    Session1->>PostgreSQL: pg_advisory_lock(100)
+    Session2->>PostgreSQL: pg_advisory_lock(100) (Blocks)
+    Session1->>PostgreSQL: pg_advisory_unlock(100)
+    Session2->>PostgreSQL: Lock acquired
 ```
+
+**Examples**:
+1. **Basic Advisory Lock**:
+   ```sql
+   -- Acquire lock
+   SELECT pg_advisory_lock(100);
+
+   -- Release lock
+   SELECT pg_advisory_unlock(100);
+   ```
+
+2. **Non-Blocking Lock**:
+   ```sql
+   -- Try to acquire lock
+   SELECT pg_try_advisory_lock(101) AS lock_acquired;
+   ```
+
+3. **Transaction-Level Lock**:
+   ```sql
+   BEGIN;
+   SELECT pg_advisory_xact_lock(102);
+   -- Perform operations
+   COMMIT; -- Lock released
+   ```
+
+4. **Two-Key Lock**:
+   ```sql
+   -- Acquire lock with two keys
+   SELECT pg_advisory_lock(1, 2);
+
+   -- Release lock
+   SELECT pg_advisory_unlock(1, 2);
+   ```
+
+5. **Safe Counter Increment**:
+   ```sql
+   -- Create counters table
+   CREATE TABLE counters (
+       id SERIAL PRIMARY KEY,
+       name TEXT UNIQUE NOT NULL,
+       value INTEGER NOT NULL DEFAULT 0
+   );
+
+   -- Create function with advisory lock
+   CREATE OR REPLACE FUNCTION safe_increment_counter(counter_name TEXT)
+   RETURNS INTEGER AS $$
+   DECLARE
+       counter_id INTEGER;
+       current_value INTEGER;
+   BEGIN
+       SELECT id INTO counter_id FROM counters WHERE name = counter_name;
+       IF NOT FOUND THEN
+           INSERT INTO counters (name, value) VALUES (counter_name, 0) RETURNING id INTO counter_id;
+       END IF;
+       PERFORM pg_advisory_lock(counter_id);
+       SELECT value INTO current_value FROM counters WHERE id = counter_id;
+       UPDATE counters SET value = value + 1 WHERE id = counter_id;
+       PERFORM pg_advisory_unlock(counter_id);
+       RETURN current_value + 1;
+   END;
+   $$ LANGUAGE plpgsql;
+
+   -- Use function
+   SELECT safe_increment_counter('visitors');
+   ```
 
 ## Best Practices
 
-1. **Custom Data Types:**
-   - Use domain types to enforce consistent constraints across your schema
-   - Consider using ENUM types for fixed sets of values, but be aware of limitations when values need to change
-   - Use composite types to group related attributes when they commonly appear together
-   - Use range types for intervals of values to simplify range-based queries
+1. **Custom Data Types**:
+   - Use domain types for reusable constraints.
+   - Use ENUMs for fixed, stable value sets.
+   - Leverage composite types for structured data.
+   - Use range types for interval-based queries.
 
-2. **Inheritance:**
-   - Use inheritance to model "is-a" relationships
-   - Be aware that constraints on parent tables are not automatically enforced on child tables
-   - Consider using partitioning instead of inheritance for large tables where the goal is to improve performance
-   - Remember that table inheritance doesn't provide true polymorphism
+2. **Inheritance**:
+   - Use for logical "is-a" relationships.
+   - Avoid relying on parent table constraints for children.
+   - Consider partitioning for performance.
 
-3. **Partitioning:**
-   - Choose the right partitioning strategy based on your query patterns
-   - Partition on columns that are frequently used in WHERE clauses
-   - Don't create too many partitions - hundreds is reasonable, thousands may not be
-   - Regularly monitor and manage partitions, adding new ones or archiving old ones as needed
-   - Consider using a default partition to catch unexpected values
+3. **Partitioning**:
+   - Choose partitioning strategy based on query patterns.
+   - Keep partition counts reasonable (hundreds, not thousands).
+   - Use default partitions for unexpected values.
 
-4. **Extensions:**
-   - Only install extensions you need to minimize potential security vulnerabilities
-   - Keep extensions updated to benefit from improvements and security fixes
-   - Test extensions thoroughly in non-production environments before deploying to production
-   - Be aware of the performance impact of extensions, especially those that add triggers or hooks
+4. **Extensions**:
+   - Install only necessary extensions.
+   - Test extensions in development environments.
+   - Monitor extension performance impacts.
 
-5. **Advisory Locks:**
-   - Use advisory locks for application-level coordination rather than row locking when possible
-   - Choose between session-level and transaction-level locks based on your needs
-   - Always ensure locks are released, even in error cases
-   - Use a consistent ID generation scheme for your locks to avoid conflicts
+5. **Advisory Locks**:
+   - Use for application-level coordination.
+   - Ensure locks are released to avoid deadlocks.
+   - Use consistent lock IDs across the application.
 
 ## Exercises
 
-Complete the exercises in the `exercises.sql` file to practice these advanced PostgreSQL features.
+Complete the exercises in the `exercises.sql` file to practice these concepts hands-on.
 
 ## Additional Resources
 
-1. PostgreSQL Documentation on:
-   - [User-Defined Types](https://www.postgresql.org/docs/current/xtypes.html)
-   - [Inheritance](https://www.postgresql.org/docs/current/ddl-inherit.html)
-   - [Table Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html)
-   - [Extensions](https://www.postgresql.org/docs/current/external-extensions.html)
-   - [Advisory Locks](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
+- **PostgreSQL Documentation**:
+  - [User-Defined Types](https://www.postgresql.org/docs/current/xtypes.html)
+  - [Inheritance](https://www.postgresql.org/docs/current/ddl-inherit.html)
+  - [Table Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html)
+  - [Extensions](https://www.postgresql.org/docs/current/external-extensions.html)
+  - [Advisory Locks](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
-2. Additional Reading:
-   - "PostgreSQL 14 Administration Cookbook" by Simon Riggs, Gianni Ciolli
-   - "Mastering PostgreSQL 13" by Hans-Jürgen Schönig
+- **Books**:
+  - *PostgreSQL 14 Administration Cookbook* by Simon Riggs, Gianni Ciolli
+  - *Mastering PostgreSQL 13* by Hans-Jürgen Schönig
+
