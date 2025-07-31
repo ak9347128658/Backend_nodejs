@@ -14,6 +14,11 @@ This project guides you through building a complete backend for an e-commerce ap
 ### Technology Stack:
 - **Node.js & Express.js**: Server framework
 - **PostgreSQL**: Database (using raw SQL queries with `pg` module)
+  - Full-text search for advanced product searching
+  - JSON/JSONB data types for flexible schema design
+- **Amazon Ion**: Rich data serialization format (superset of JSON)
+  - Integration with PostgreSQL for advanced data storage
+  - Enhanced type system for complex e-commerce data
 - **bcrypt**: Password hashing
 - **JWT/express-session**: Authentication
 - **Multer**: File uploads
@@ -71,6 +76,13 @@ The project is divided into 10 days of focused development:
 10. **Day 10**: Final Touches, Documentation, and Deployment Preparation
 
 Each day has its own detailed document with specific tasks, code examples, and learning objectives.
+
+## Advanced Database Features
+
+To leverage the advanced capabilities in your e-commerce application:
+
+- [PostgreSQL Full-Text Search and JSON](postgresql_advanced_features.md): Learn how to implement powerful product search functionality and flexible data storage using PostgreSQL's full-text search and JSON capabilities.
+- [Ion Project with PostgreSQL](ion_project.md): Discover how to integrate Amazon Ion data format with PostgreSQL, combining Ion's rich type system with PostgreSQL's full-text search and JSON capabilities.
 
 ## Getting Started
 
