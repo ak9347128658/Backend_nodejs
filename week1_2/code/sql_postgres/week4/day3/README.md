@@ -1,417 +1,292 @@
-# Day 3: Database Security and User Management in PostgreSQL
+# Database Security and User Management in PostgreSQL
 
-This document provides a detailed guide to securing a PostgreSQL database, tailored for students learning database administration. Each topic is explained clearly with at least five practical examples and a Mermaid.js diagram to visualize the concept. The document includes exercises and practice questions to reinforce learning through hands-on practice.
+## Introduction
 
-## Topics Covered
+This guide provides a comprehensive overview of database security and user management in PostgreSQL, tailored for SQL instructors to teach students. It includes practical examples, visual aids, and data population examples to demonstrate key concepts, ensuring students understand how to secure a PostgreSQL database and manage user access effectively.
 
-### 1. Roles and Privileges
-**Definition**: Roles in PostgreSQL manage database access permissions. A role can represent a user or a group and can inherit privileges from other roles. Privileges define actions (e.g., SELECT, INSERT) a role can perform on database objects.
+## Table of Contents
 
-**Key Concepts**:
-- **Creating Roles**: Use `CREATE ROLE` to define users or groups.
-- **Granting Privileges**: Use `GRANT` to assign permissions.
-- **Revoking Privileges**: Use `REVOKE` to remove permissions.
-- **Role Inheritance**: A role can inherit privileges from another role.
-- **Default Privileges**: Set permissions for future objects with `ALTER DEFAULT PRIVILEGES`.
+1. Why Security and User Management Matter
+2. Authentication Methods
+3. Role-Based Access Control (RBAC)
+4. Managing Users and Roles
+5. Granting and Revoking Privileges
+6. Populating the Orders Table
+7. Best Practices for Security
+8. Common Security Problems and Fixes
+9. Conclusion
 
-**Mermaid Diagram**:
-```mermaid
-graph TD
-    A[Roles and Privileges] --> B[Create Role]
-    A --> C[Grant Privileges]
-    A --> D[Revoke Privileges]
-    A --> E[Role Inheritance]
-    A --> F[Default Privileges]
-    B --> B1[User Role]
-    B --> B2[Group Role]
-    C --> C1[Schema Access]
-    C --> C2[Table Access]
-    D --> D1[Remove Access]
-    E --> E1[Inherit Role]
-    F --> F1[Future Objects]
+## 1. Why Security and User Management Matter
+
+Database security protects sensitive data from unauthorized access or modification, while user management ensures only authorized individuals can perform specific actions, such as reading or updating data. Together, they maintain data integrity, confidentiality, and availability.
+
+**Real Example**: A university database stores student grades. Without security, anyone could alter grades, leading to inaccurate records. User management ensures only professors can update grades, while students can only view their own.
+
+## 2. Authentication Methods
+
+Authentication verifies a user’s identity. PostgreSQL supports several methods:
+
+- **Password Authentication**: Users provide a username and password.
+- **Certificate Authentication**: Uses SSL certificates for identity.
+- **Kerberos Authentication**: Secure network authentication.
+- **LDAP Authentication**: Integrates with a centralized directory.
+
+The `pg_hba.conf` file controls access. Example configuration:
+
+```plaintext
+# Allow users from 192.168.1.0/24 to connect with MD5 password
+host all all 192.168.1.0/24 md5
 ```
 
-**Examples**:
-1. **Creating a Role with Login**:
-   ```sql
-   CREATE ROLE data_analyst LOGIN PASSWORD 'SecurePass123';
-   ```
-   Creates a role `data_analyst` that can log in with a password.
+**Real Example**: A company configures `pg_hba.conf` to allow only employees on the internal network (192.168.1.0/24) to access the database with passwords, preventing external access.
 
-2. **Granting Schema Access**:
-   ```sql
-   GRANT USAGE ON SCHEMA public TO data_analyst;
-   ```
-   Allows `data_analyst` to access objects in the `public` schema.
+## 3. Role-Based Access Control (RBAC)
 
-3. **Granting Table Privileges**:
-   ```sql
-   GRANT SELECT, INSERT ON employees TO data_analyst;
-   ```
-   Permits `data_analyst` to read and insert data into the `employees` table.
+RBAC uses roles to manage permissions. Roles can represent users or groups and can inherit permissions.
 
-4. **Setting Default Privileges**:
-   ```sql
-   ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO data_analyst;
-   ```
-   Grants SELECT on all future tables in the `public` schema to `data_analyst`.
+**Real Example**: In an e-commerce database, you create roles for different departments:
 
-5. **Role Inheritance**:
-   ```sql
-   CREATE ROLE team_lead;
-   GRANT data_analyst TO team_lead;
-   ```
-   `team_lead` inherits all privileges of `data_analyst`.
+```sql
+-- Create roles for different access levels
+CREATE ROLE order_reader;
+CREATE ROLE order_manager;
 
----
+-- Grant read-only access to orders table
+GRANT SELECT ON orders TO order_reader;
 
-### 2. Authentication Methods
-**Definition**: Authentication methods verify user identity during database connections. The `pg_hba.conf` file controls authentication rules based on user, database, and connection type.
-
-**Key Concepts**:
-- **Password Authentication**: Uses encrypted passwords (e.g., SCRAM-SHA-256).
-- **Peer Authentication**: Trusts OS user for local connections.
-- **Other Methods**: Includes GSSAPI, LDAP for enterprise setups.
-- **pg_hba.conf**: Configures authentication rules.
-
-**Mermaid Diagram**:
-```mermaid
-graph TD
-    A[Authentication Methods] --> B[Password Auth]
-    A --> C[Peer Auth]
-    A --> D[pg_hba.conf]
-    A --> E[GSSAPI]
-    A --> F[LDAP]
-    B --> B1[SCRAM-SHA-256]
-    C --> C1[Local OS User]
-    D --> D1[Configure Rules]
-    E --> E1[Kerberos]
-    F --> F1[Enterprise Auth]
+-- Grant read and write access to orders table
+GRANT SELECT, INSERT, UPDATE ON orders TO order_manager;
 ```
 
-**Examples**:
-1. **Creating a Role with Password**:
-   ```sql
-   CREATE ROLE app_user LOGIN ENCRYPTED PASSWORD 'AppPass2025';
-   ```
-   Creates a role with a SCRAM-SHA-256 encrypted password.
+**Mermaid Diagram: RBAC Structure**
 
-2. **Configuring pg_hba.conf for Peer Authentication**:
-   ```
-   # TYPE  DATABASE  USER  ADDRESS  METHOD
-   local   all       all            peer
-   ```
-   Allows local connections without a password if OS username matches a role.
-
-3. **Configuring pg_hba.conf for Host Authentication**:
-   ```
-   # TYPE  DATABASE  USER  ADDRESS         METHOD
-   host    all       all   192.168.1.0/24  scram-sha-256
-   ```
-   Requires password for connections from the specified IP range.
-
-4. **Testing Authentication**:
-   ```sql
-   \c postgres app_user
-   ```
-   Connects as `app_user`, prompting for the password.
-
-5. **GSSAPI Authentication** (conceptual):
-   ```
-   # TYPE  DATABASE  USER  ADDRESS  METHOD
-   hostgssenc all      all   0.0.0.0/0  gss
-   ```
-   Configures GSSAPI for encrypted connections.
-
----
-
-### 3. Row-Level Security (RLS)
-**Definition**: Row-Level Security restricts access to specific table rows based on user identity or conditions, enhancing data privacy.
-
-**Key Concepts**:
-- **Enabling RLS**: Use `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`.
-- **Creating Policies**: Define row access rules with `CREATE POLICY`.
-- **Use Cases**: Restrict users to their own data.
-
-**Mermaid Diagram**:
 ```mermaid
 graph TD
-    A[Row-Level Security] --> B[Enable RLS]
-    A --> C[Create Policy]
-    A --> D[User Access]
-    A --> E[Manager Access]
-    A --> F[Drop Policy]
-    B --> B1[Table Setup]
-    C --> C1[Row Conditions]
-    D --> D1[Current User]
-    E --> E1[All Rows]
-    F --> F1[Remove Policy]
+    A[Database] --> B[Role: order_reader]
+    A --> C[Role: order_manager]
+    B --> D[SELECT on orders]
+    C --> E[SELECT, INSERT, UPDATE on orders]
+    F[User: alice] --> B
+    G[User: bob] --> C
 ```
 
-**Examples**:
-1. **Creating a Table with RLS**:
-   ```sql
-   CREATE TABLE employee_records (
-       id SERIAL PRIMARY KEY,
-       username TEXT,
-       salary INTEGER
-   );
-   ALTER TABLE employee_records ENABLE ROW LEVEL SECURITY;
-   ```
+**Explanation**: `alice` (a customer service rep) gets read-only access via `order_reader`, while `bob` (a manager) gets broader access via `order_manager`.
 
-2. **Policy for User-Specific Access**:
-   ```sql
-   CREATE POLICY employee_access ON employee_records
-       USING (username = current_user);
-   ```
-   Users see only rows where `username` matches their role.
+## 4. Managing Users and Roles
 
-3. **Policy for Managers**:
-   ```sql
-   CREATE ROLE manager;
-   CREATE POLICY manager_access ON employee_records
-       FOR SELECT TO manager
-       USING (TRUE);
-   ```
-   Managers can view all rows.
+Users are roles with login privileges. Here’s how to manage them:
 
-4. **Testing RLS**:
-   ```sql
-   SET ROLE data_analyst;
-   INSERT INTO employee_records (username, salary) VALUES ('data_analyst', 50000);
-   SELECT * FROM employee_records;
-   ```
-   The user sees only their own record.
+**Create a User**
 
-5. **Dropping a Policy**:
-   ```sql
-   DROP POLICY employee_access ON employee_records;
-   ```
-   Removes the `employee_access` policy.
+```sql
+CREATE USER alice WITH PASSWORD 'SecurePass2025!';
+```
 
----
+**Change a User**
 
-### 4. Encryption
-**Definition**: PostgreSQL supports encryption for data at rest (stored) and in transit (network). The `pgcrypto` extension enables column-level encryption.
+```sql
+ALTER USER alice WITH PASSWORD 'NewSecurePass2025!';
+```
 
-**Key Concepts**:
-- **Data at Rest**: Encrypt tablespaces or disks.
-- **Data in Transit**: Use SSL/TLS for secure connections.
-- **Column-Level Encryption**: Use `pgcrypto` for specific columns.
+**Delete a User**
 
-**Mermaid Diagram**:
+```sql
+DROP USER alice;
+```
+
+**Manage Roles**
+
+```sql
+-- Assign user to role
+GRANT order_reader TO alice;
+
+-- Remove user from role
+REVOKE order_reader FROM alice;
+```
+
+**Real Example**: A library database creates a user `librarian1` and assigns them to a `catalog_manager` role to update book records:
+
+```sql
+CREATE ROLE catalog_manager;
+GRANT SELECT, INSERT, UPDATE ON books TO catalog_manager;
+CREATE USER librarian1 WITH PASSWORD 'Library2025!';
+GRANT catalog_manager TO librarian1;
+```
+
+## 5. Granting and Revoking Privileges
+
+Privileges control actions like SELECT (read), INSERT (create), UPDATE (modify), and DELETE (remove).
+
+**Grant Privileges**
+
+```sql
+-- Allow order_reader to read orders
+GRANT SELECT ON orders TO order_reader;
+
+-- Allow order_manager to modify orders
+GRANT INSERT, UPDATE ON orders TO order_manager;
+```
+
+**Revoke Privileges**
+
+```sql
+-- Remove update permission from order_manager
+REVOKE UPDATE ON orders FROM order_manager;
+```
+
+**Mermaid Diagram: CRUD Operations**
+
 ```mermaid
-graph TD
-    A[Encryption] --> B[pgcrypto]
-    A --> C[SSL/TLS]
-    A --> D[Column Encryption]
-    A --> E[Tablespace Encryption]
-    A --> F[Password Hashing]
-    B --> B1[Install Extension]
-    C --> C1[Configure Server]
-    D --> D1[AES Encryption]
-    E --> E1[Disk Encryption]
-    F --> F1[Hash Passwords]
+classDiagram
+    class Orders_Table {
+        +order_id
+        +customer_id
+        +order_date
+        +total_amount
+    }
+    class Order_Reader {
+        +SELECT()
+    }
+    class Order_Manager {
+        +SELECT()
+        +INSERT()
+        +UPDATE()
+    }
+    Orders_Table <|-- Order_Reader : Read
+    Orders_Table <|-- Order_Manager : Read/Write
 ```
 
-**Examples**:
-1. **Installing pgcrypto**:
-   ```sql
-   CREATE EXTENSION IF NOT EXISTS pgcrypto;
-   ```
+**Real Example**: In a hospital database, `nurse` role can read patient records, while `doctor` role can update them:
 
-2. **Encrypting a Password**:
-   ```sql
-   CREATE TABLE users (
-       user_id SERIAL PRIMARY KEY,
-       username TEXT,
-       password_hash TEXT
-   );
-   INSERT INTO users (username, password_hash)
-   VALUES ('bob', crypt('BobPass123', gen_salt('bf')));
-   ```
+```sql
+GRANT SELECT ON patient_records TO nurse;
+GRANT SELECT, UPDATE ON patient_records TO doctor;
+```
 
-3. **Verifying a Password**:
-   ```sql
-   SELECT username FROM users
-   WHERE password_hash = crypt('BobPass123', password_hash);
-   ```
+**User View Example**
 
-4. **Encrypting a Column with AES**:
-   ```sql
-   INSERT INTO users (username, password_hash)
-   VALUES ('charlie', pgp_sym_encrypt('SecretData', 'my_key'));
-   ```
+Views restrict data visibility. Create a view for nurses to see only patient names and IDs:
 
-5. **Enabling SSL** (conceptual):
-   ```
-   # In postgresql.conf:
-   ssl = on
-   ssl_cert_file = 'server.crt'
-   ssl_key_file = 'server.key'
-   ```
+```sql
+CREATE VIEW nurse_patient_view AS
+SELECT patient_id, patient_name
+FROM patient_records;
 
----
+GRANT SELECT ON nurse_patient_view TO nurse;
+```
 
-### 5. Auditing and Logging
-**Definition**: Auditing tracks database activities, and logging records events like queries and connections for monitoring and debugging.
+**Mermaid Diagram: User View**
 
-**Key Concepts**:
-- **Logging Settings**: Configure in `postgresql.conf` (e.g., `log_statement`).
-- **Extensions**: Use `pgaudit` for detailed auditing.
-- **Use Cases**: Monitor unauthorized access or performance.
-
-**Mermaid Diagram**:
 ```mermaid
-graph TD
-    A[Auditing and Logging] --> B[Query Logging]
-    A --> C[Connection Logging]
-    A --> D[pgaudit]
-    A --> E[Log Analysis]
-    A --> F[CSV Logging]
-    B --> B1[Log All Queries]
-    C --> C1[Track Connections]
-    D --> D1[Install Extension]
-    E --> E1[Failed Logins]
-    F --> F1[Log Destination]
+classDiagram
+    class Patient_Records {
+        +patient_id
+        +patient_name
+        +diagnosis
+        +treatment
+    }
+    class Nurse_Patient_View {
+        +patient_id
+        +patient_name
+    }
+    Patient_Records --> Nurse_Patient_View : Restricted View
+    Nurse_Patient_View --> Nurse_Role : SELECT
 ```
 
-**Examples**:
-1. **Enabling Query Logging**:
-   ```sql
-   -- In postgresql.conf:
-   log_statement = 'all'
-   ```
+**Explanation**: Nurses see only `patient_id` and `patient_name`, not sensitive data like `diagnosis`.
 
-2. **Logging Connections**:
-   ```sql
-   -- In postgresql.conf:
-   log_connections = on
-   log_disconnections = on
-   ```
+## 6. Populating the Orders Table
 
-3. **Installing pgaudit**:
-   ```sql
-   CREATE EXTENSION pgaudit;
-   ```
+To demonstrate practical usage, let’s create and populate the `orders` table with 20 records. This table is referenced in earlier examples for RBAC and privileges.
 
-4. **Querying Logs for Failed Logins**:
-   ```sql
-   -- Check PostgreSQL log file for entries with "FATAL: password authentication failed"
-   ```
+**Create the Orders Table**
 
-5. **Setting Log Destination**:
-   ```sql
-   -- In postgresql.conf:
-   log_destination = 'csvlog'
-   logging_collector = on
-   ```
-
----
-
-### 6. Best Practices
-**Definition**: Security best practices ensure a robust PostgreSQL database by minimizing risks and maintaining control.
-
-**Key Concepts**:
-- **Principle of Least Privilege**: Grant only necessary permissions.
-- **Credential Rotation**: Regularly update passwords.
-- **Monitoring and Alerting**: Detect anomalies with tools.
-
-**Mermaid Diagram**:
-```mermaid
-graph TD
-    A[Best Practices] --> B[Least Privilege]
-    A --> C[Credential Rotation]
-    A --> D[Monitoring]
-    A --> E[Superuser Restriction]
-    A --> F[Alerting]
-    B --> B1[Minimal Permissions]
-    C --> C1[Update Passwords]
-    D --> D1[pg_stat_activity]
-    E --> E1[Limit Superusers]
-    F --> F1[Log Alerts]
+```sql
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INTEGER NOT NULL,
+    order_date DATE NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL
+);
 ```
 
-**Examples**:
-1. **Applying Least Privilege**:
-   ```sql
-   GRANT SELECT ON employees TO readonly;
-   ```
+**Insert 20 Records**
 
-2. **Rotating Passwords**:
-   ```sql
-   ALTER ROLE data_analyst WITH PASSWORD 'NewPass2025';
-   ```
+```sql
+INSERT INTO orders (customer_id, order_date, total_amount) VALUES
+(101, '2025-01-01', 150.25),
+(102, '2025-01-02', 89.99),
+(103, '2025-01-03', 245.50),
+(101, '2025-01-04', 45.00),
+(104, '2025-01-05', 300.75),
+(105, '2025-01-06', 120.00),
+(102, '2025-01-07', 65.30),
+(106, '2025-01-08', 500.00),
+(107, '2025-01-09', 75.25),
+(108, '2025-01-10', 200.00),
+(109, '2025-01-11', 99.99),
+(110, '2025-01-12', 350.45),
+(101, '2025-01-13', 180.00),
+(104, '2025-01-14', 60.50),
+(111, '2025-01-15', 275.00),
+(112, '2025-01-16', 130.75),
+(113, '2025-01-17', 400.00),
+(114, '2025-01-18', 55.25),
+(115, '2025-01-19', 220.00),
+(116, '2025-01-20', 95.00);
+```
 
-3. **Restricting Superuser Access**:
-   ```sql
-   ALTER ROLE admin WITH NOSUPERUSER;
-   ```
+**Verify Data**
 
-4. **Monitoring Active Connections**:
-   ```sql
-   SELECT * FROM pg_stat_activity WHERE state = 'active';
-   ```
+```sql
+SELECT * FROM orders LIMIT 5;
+```
 
-5. **Enabling Alerts** (conceptual):
-   ```sql
-   -- Use tools like pgBadger to analyze logs for anomalies
-   ```
+**Explanation**: The `orders` table now contains 20 records with varied `customer_id`, `order_date`, and `total_amount` values, simulating real e-commerce data. The `order_reader` role can query this data, while `order_manager` can insert or update records.
 
----
+## 7. Best Practices for Security
 
-## Exercises
+1. **Strong Passwords**: Use complex passwords (e.g., `SecurePass2025!`).
+2. **Least Privilege**: Grant only necessary permissions.
+3. **Regular Audits**: Review roles and privileges periodically.
+4. **Encryption**: Use SSL/TLS for connections.
+5. **Updates**: Keep PostgreSQL updated to patch vulnerabilities.
 
-Practice these exercises to apply PostgreSQL security concepts:
+**Real Example**: A bank database enforces SSL connections and audits privileges quarterly to ensure only tellers can view account balances and only managers can approve transactions.
 
-1. **Create a Role and Assign Privileges**:
-   Create a role `appuser` with login and a secure password. Grant it SELECT and INSERT on the `customers` table.
+## 8. Common Security Problems and Fixes
 
-2. **Revoke Privileges**:
-   Revoke INSERT from `appuser` on the `customers` table.
+**SQL Injection**
 
-3. **Implement Row-Level Security**:
-   Create a table `employee_data` with `id`, `username`, and `salary`. Enable RLS so only the employee (by username) sees their record.
+Attackers inject malicious SQL. Prevent it with parameterized queries:
 
-4. **Use pgcrypto for Passwords**:
-   Create a table for user credentials and use `pgcrypto` to encrypt and verify passwords.
+```sql
+-- Vulnerable query
+SELECT * FROM users WHERE username = 'user_input';
 
-5. **List Roles and Privileges**:
-   Write a query to show all roles and their privileges in the current database.
+-- Safe query
+PREPARE safe_query AS SELECT * FROM users WHERE username = $1;
+EXECUTE safe_query('user_input');
+```
 
-6. **Enable SSL Connections**:
-   Describe the steps to configure SSL in PostgreSQL (no code required).
+**Weak Passwords**
 
-7. **Configure Query Logging**:
-   Enable logging of all queries and explain how to find failed login attempts.
+Enforce strong passwords and periodic changes:
 
-8. **Create a Manager Role**:
-   Create a `manager` role that inherits `appuser` privileges and add UPDATE on `customers`.
+```sql
+ALTER USER alice WITH PASSWORD 'ComplexPass2025!' VALID UNTIL '2026-01-01';
+```
 
-9. **Test RLS with Multiple Users**:
-   Insert data into `employee_data` for two users, then test RLS by querying as each.
+**Excessive Privileges**
 
-10. **Monitor Connections**:
-    Use `pg_stat_activity` to monitor active database connections.
+Regularly review permissions:
 
----
+```sql
+SELECT * FROM information_schema.table_privileges WHERE table_name = 'orders';
+```
 
-## Practice Questions
+**Real Example**: A retail database was vulnerable to SQL injection. Switching to parameterized queries and limiting `cashier` role to `SELECT` and `INSERT` reduced risks.
 
-1. What is the purpose of the `LOGIN` attribute in a PostgreSQL role?
-2. How does `pg_hba.conf` manage different authentication methods?
-3. Why is Row-Level Security critical for multi-user applications?
-4. What advantages does `pgcrypto` provide for data encryption?
-5. How does the principle of least privilege enhance database security?
+## 9. Conclusion
 
----
-
-## Getting Started
-
-1. **Install PostgreSQL**: Ensure PostgreSQL is running.
-2. **Run Examples**: Execute the SQL examples in a PostgreSQL client (e.g., psql).
-3. **Complete Exercises**: Work through the exercises to practice.
-4. **Check Logs**: Review PostgreSQL logs for auditing insights.
-5. **Study Diagrams**: Use the Mermaid diagrams to visualize each topic.
-
-This document equips you with the knowledge and tools to secure a PostgreSQL database effectively. Practice the examples and exercises to build expertise.
+Mastering PostgreSQL security and user management ensures data protection and controlled access. This guide, with practical examples, diagrams, and data population, equips instructors to teach students how to secure databases and manage users effectively, preparing them for real-world SQL challenges.
