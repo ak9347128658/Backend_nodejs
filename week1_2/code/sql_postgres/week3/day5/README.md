@@ -456,3 +456,38 @@ WHERE content_tsv @@ to_tsquery('english', 'error:*');
 ```
 
 Full text search excels in these scenarios by handling natural language flexibly and efficiently, especially with the use of boolean and wildcard operators.
+
+
+
+### Practice Questions for PostgreSQL Full Text Search
+
+1. **Table Creation and Data Insertion (Basic)**  
+   Create a table called `articles` with columns `id` (SERIAL, primary key), `title` (TEXT), and `body` (TEXT). Insert 10 sample records with varied titles and content related to databases and programming. Write the SQL statements for both the table creation and data insertion.
+
+2. **Simple Full Text Search (Basic)**  
+   Using the `articles` table, write a query to find all records where the `body` contains the word "database" using full text search. Use `to_tsvector` and `to_tsquery` without an index.
+
+3. **Phrase Search (Intermediate)**  
+   Write a query to search for articles in the `articles` table where the `body` contains the exact phrase "full text search". Explain how the query ensures the words appear in sequence.
+
+4. **Boolean Search with AND and OR (Intermediate)**  
+   Write a query to find articles where the `body` contains both "PostgreSQL" and either "query" or "indexing". Use the `&` and `|` operators in the `to_tsquery` function.
+
+5. **Excluding Terms with NOT (Intermediate)**  
+   Write a query to find articles where the `body` contains "database" but does not contain "performance" or "optimization". Use the `!` operator and explain its effect.
+
+6. **Wildcard Search (Intermediate)**  
+   Write a query to find articles where the `body` contains words starting with "program". Use the `*` operator and provide an example of what words might match (e.g., "programming", "programmer").
+
+7. **Creating a Trigger for tsvector Updates (Advanced)**  
+   Add a `tsvector` column named `body_tsv` to the `articles` table. Create a `BEFORE INSERT OR UPDATE` trigger to automatically update `body_tsv` with the `to_tsvector` of the `body` column. Write the SQL for the column addition, trigger function, and trigger creation.
+
+8. **Logging with an After Insert Trigger (Advanced)**  
+   Create an audit table called `article_audit` with columns `id` (SERIAL, primary key), `article_id` (INTEGER), and `inserted_at` (TIMESTAMP). Write an `AFTER INSERT` trigger on the `articles` table to log the `id` of new articles into `article_audit`. Provide the SQL for the audit table, trigger function, and trigger.
+
+9. **Indexing for Performance (Advanced)**  
+   Create both a GIN and a GiST index on the `body_tsv` column of the `articles` table. Write a query to search for "database & performance" and explain how each index type impacts query performance. Include the SQL for creating both indexes.
+
+10. **Ranking and Multi-Column Search (Advanced)**  
+    Add a `tsvector` column named `title_tsv` to the `articles` table and populate it with `to_tsvector('english', title)`. Create a GIN index combining `title_tsv` and `body_tsv`. Write a query to search for articles where either the `title` or `body` contains "PostgreSQL & tips", and rank the results by relevance using `ts_rank`. Order the results by rank in descending order. Provide all necessary SQL statements.
+
